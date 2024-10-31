@@ -1,0 +1,12 @@
+# 10.29
+- Set up structure of project yesterday
+- Basic frontend with dependancies and dynamic ui 
+- Created essential components and enhanced them
+- Set up strucutre for backend
+- Imported dictionary (SQLite)
+- Fixed tailwind issue
+- Added form handling and validation
+- Setup state management for auth
+- Setup backend
+- Setup auth routes and controllers
+- Tested using curl and postman 
