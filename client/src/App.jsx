@@ -1,5 +1,6 @@
+// src/App.jsx
 import { Routes, Route } from 'react-router-dom'
-import { AuthProvider } from './context/AuthContext' 
+import { AuthProvider } from './context/AuthContext'
 import Layout from './components/Layout'
 import Home from './pages/Home'
 import Services from './pages/Services'
@@ -7,6 +8,9 @@ import Blog from './pages/Blog'
 import Contact from './pages/Contact'
 import Login from './pages/Login'
 import Register from './pages/Register'
+import AdminDashboard from './pages/AdminDashboard'
+import ProtectedRoute from './components/ProtectedRoute'
+import AdminRoute from './components/AdminRoute'
 
 function App() {
   return (
@@ -20,6 +24,14 @@ function App() {
             <Route path="contact" element={<Contact />} />
             <Route path="login" element={<Login />} />
             <Route path="register" element={<Register />} />
+            <Route 
+              path="admin" 
+              element={
+                <AdminRoute>
+                  <AdminDashboard />
+                </AdminRoute>
+              } 
+            />
           </Route>
         </Routes>
       </div>

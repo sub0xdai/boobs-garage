@@ -31,3 +31,7 @@
 - Admin priviliges 
 - Form validation
 - Add assets
+- Different themes/selector
+
+# 11.01
+

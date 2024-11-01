@@ -26,6 +26,8 @@ function initializeTables() {
       email TEXT NOT NULL UNIQUE,
       password_hash TEXT NOT NULL,
       is_admin INTEGER DEFAULT 0,
+      last_login TEXT,
+      session_token TEXT,
       created_at TEXT NOT NULL
     )`,
     `CREATE TABLE IF NOT EXISTS services (

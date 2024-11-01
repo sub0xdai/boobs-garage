@@ -2,15 +2,16 @@
 const express = require('express');
 const router = express.Router();
 const authController = require('../controllers/authController');
-const authMiddleware = require('../middleware/auth');
+const sessionMiddleware = require('../middleware/sessionMiddleware');
+const adminMiddleware = require('../middleware/adminMiddleware');
+const { loginValidation, registerValidation, validate } = require('../middleware/validationMiddleware');
 
-// Register user
-router.post('/register', authController.register);
+router.post('/register', registerValidation, validate, authController.register);
+router.post('/login', loginValidation, validate, authController.login);
+router.get('/profile', sessionMiddleware, authController.getProfile);
 
-// Login user
-router.post('/login', authController.login);
-
-// Get user profile (protected route)
-router.get('/profile', authMiddleware, authController.getProfile);
+// Admin routes
+router.get('/users', sessionMiddleware, adminMiddleware, authController.getAllUsers);
+router.put('/users/:userId/toggle-admin', sessionMiddleware, adminMiddleware, authController.toggleUserAdmin);
 
 module.exports = router;

@@ -128,6 +128,42 @@ const authController = {
       console.error(err.message);
       res.status(500).send('Server error');
     }
+  },
+
+  // New admin-specific endpoints
+  getAllUsers: async (req, res) => {
+    try {
+      db.all(
+        'SELECT id, username, email, is_admin, last_login, created_at FROM users',
+        [],
+        (err, users) => {
+          if (err) {
+            return res.status(500).json({ message: 'Server error' });
+          }
+          res.json(users);
+        }
+      );
+    } catch (error) {
+      res.status(500).json({ message: 'Server error' });
+    }
+  },
+
+  toggleUserAdmin: async (req, res) => {
+    const { userId } = req.params;
+    try {
+      db.run(
+        'UPDATE users SET is_admin = NOT is_admin WHERE id = ?',
+        [userId],
+        (err) => {
+          if (err) {
+            return res.status(500).json({ message: 'Server error' });
+          }
+          res.json({ message: 'Admin status updated' });
+        }
+      );
+    } catch (error) {
+      res.status(500).json({ message: 'Server error' });
+    }
   }
 };
 
