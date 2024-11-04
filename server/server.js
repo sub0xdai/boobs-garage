@@ -6,11 +6,13 @@ require('dotenv').config();
 
 const app = express();
 const serviceRoutes = require('./src/routes/serviceRoutes');
+const feedbackRoutes = require('./src/routes/feedbackRoutes');
 
 // Middleware
 app.use(helmet());
 app.use(cors());
 app.use(express.json());
+app.use('/api/feedback', feedbackRoutes);
 
 // Routes
 app.use('/api/auth', require('./src/routes/authRoutes'));

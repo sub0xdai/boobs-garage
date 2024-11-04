@@ -40,5 +40,14 @@
 - Admin priviliges
 
 # 11.04
--
+- Implemented full dashboard with tab interface
+- Created components for services, users, blog, feedback
+- Set up protected admin routes
+- Implemented inline editing 
+- Added image support for blogs 
+- Created filtering system for feedback 
+- Set up backend routes for all admin functions
 
+## Issues
+- Light and dark mode need to be standard for each component 
+- Atm light mode doesnt really work, dark mode only effects the navbar. Site is optimised for darkmode but the dark mode doesn't redner across the site

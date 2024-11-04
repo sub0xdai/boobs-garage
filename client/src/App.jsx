@@ -11,9 +11,11 @@ import Register from './pages/Register'
 import AdminDashboard from './pages/AdminDashboard'
 import ProtectedRoute from './components/ProtectedRoute'
 import AdminRoute from './components/AdminRoute'
+import { ThemeProvider } from './context/ThemeContext'
 
 function App() {
   return (
+  <ThemeProvider>
     <AuthProvider>
       <div className="min-h-screen bg-gray-50">
         <Routes>
@@ -36,6 +38,7 @@ function App() {
         </Routes>
       </div>
     </AuthProvider>
+  </ThemeProvider>
   )
 }
 
