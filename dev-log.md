@@ -33,5 +33,12 @@
 - Add assets
 - Different themes/selector
 
+
 # 11.01
+- User sessions
+- From validation 
+- Admin priviliges
+
+# 11.04
+-
 

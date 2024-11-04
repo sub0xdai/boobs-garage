@@ -43,30 +43,31 @@ export function AuthProvider({ children }) {
   }, [])
 
   // Rest of your code stays the same
-  const login = async (credentials) => {
-    try {
-      setLoading(true)
-      const response = await fetch('http://localhost:5000/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(credentials)
-      })
-      const data = await response.json()
-      if (response.ok) {
-        localStorage.setItem('token', data.token)
-        await checkSession(data.token) // Add checkSession here too
-      } else {
-        throw new Error(data.message)
-      }
-    } catch (error) {
-      throw error
-    } finally {
-      setLoading(false)
+const login = async (credentials) => {
+  try {
+    setLoading(true)
+    const response = await fetch('http://localhost:5000/api/auth/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(credentials)
+    })
+    const data = await response.json()
+   
+    if (response.ok) {
+      localStorage.setItem('token', data.token)
+      await checkSession(data.token)  // Add this line
+      console.log('User after login:', user)  // Debug log
+    } else {
+      throw new Error(data.message)
     }
+  } catch (error) {
+    throw error
+  } finally {
+    setLoading(false)
   }
-
+}
   const logout = () => {
     localStorage.removeItem('token')
     setUser(null)

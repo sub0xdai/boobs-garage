@@ -5,61 +5,67 @@ const db = require('../config/database');
 
 const authController = {
   // Register user
-  register: async (req, res) => {
-    const { username, email, password } = req.body;
+register: async (req, res) => {
+  const { username, email, password } = req.body;
 
-    try {
-      // Check if user exists
-      db.get('SELECT * FROM users WHERE email = ?', [email], async (err, user) => {
-        if (err) {
-          return res.status(500).json({ message: 'Server error' });
-        }
+  try {
+    // Check if user exists
+    db.get('SELECT * FROM users WHERE email = ?', [email], async (err, user) => {
+      if (err) {
+        return res.status(500).json({ message: 'Server error' });
+      }
 
-        if (user) {
-          return res.status(400).json({ message: 'User already exists' });
-        }
+      if (user) {
+        return res.status(400).json({ message: 'User already exists' });
+      }
 
-        // Hash password
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, salt);
+      // Hash password
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(password, salt);
 
-        // Create user
-        const created_at = new Date().toISOString();
-        
-        db.run(
-          'INSERT INTO users (username, email, password_hash, created_at) VALUES (?, ?, ?, ?)',
-          [username, email, hashedPassword, created_at],
-          function(err) {
-            if (err) {
-              return res.status(500).json({ message: 'Error creating user' });
-            }
-
-            // Create JWT token
-            const payload = {
-              user: {
-                id: this.lastID,
-                email
-              }
-            };
-
-            jwt.sign(
-              payload,
-              process.env.JWT_SECRET,
-              { expiresIn: '1h' },
-              (err, token) => {
-                if (err) throw err;
-                res.json({ token });
-              }
-            );
+      // Create user
+      const created_at = new Date().toISOString();
+      
+      db.run(
+        'INSERT INTO users (username, email, password_hash, created_at) VALUES (?, ?, ?, ?)',
+        [username, email, hashedPassword, created_at],
+        function(err) {
+          if (err) {
+            return res.status(500).json({ message: 'Error creating user' });
           }
-        );
-      });
-    } catch (err) {
-      console.error(err.message);
-      res.status(500).send('Server error');
-    }
-  },
 
+          // Create JWT token
+          const payload = {
+            user: {
+              id: this.lastID,
+              email
+            }
+          };
+
+          jwt.sign(
+            payload,
+            process.env.JWT_SECRET,
+            { expiresIn: '1h' },
+            (err, token) => {
+              if (err) throw err;
+              res.json({ 
+                token,
+                user: {
+                  id: this.lastID,
+                  email,
+                  isAdmin: false
+                }
+              });
+            }
+          );
+        }
+      );
+    });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+},
   // Login user
   login: async (req, res) => {
     const { email, password } = req.body;
@@ -86,7 +92,8 @@ const authController = {
         const payload = {
           user: {
             id: user.id,
-            email: user.email
+            email: user.email,
+            isAdmin: Boolean(user.is_admin)
           }
         };
 
@@ -96,7 +103,14 @@ const authController = {
           { expiresIn: '1h' },
           (err, token) => {
             if (err) throw err;
-            res.json({ token });
+            res.json({ 
+            token,
+            user: {
+              id: user.id,
+              email: user.email,
+              isAdmin: Boolean(user.is_admin)
+            }
+            });
           }
         );
       });
@@ -121,7 +135,13 @@ const authController = {
             return res.status(404).json({ message: 'User not found' });
           }
 
-          res.json(user);
+          res.json({
+            id: user.id,
+            username: user.username,
+            email: user.email,
+            isAdmin: Boolean(user.is_admin),
+            created_at: user.created_at
+          });
         }
       );
     } catch (err) {
