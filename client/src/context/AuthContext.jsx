@@ -1,5 +1,6 @@
 // src/context/AuthContext.jsx
 import { createContext, useState, useEffect } from 'react'
+import { api } from '../utils/fetchWithAuth.js'
 
 export const AuthContext = createContext(null)
 
@@ -10,6 +11,7 @@ export function AuthProvider({ children }) {
   const login = async (credentials) => {
     try {
       setLoading(true)
+      console.log('Login attempt with:', { email: credentials.email })
       const response = await fetch('http://localhost:5000/api/auth/login', {
         method: 'POST',
         headers: {
@@ -43,10 +45,12 @@ export function AuthProvider({ children }) {
   }
 
   const logout = () => {
+    console.log('Logging out')
     localStorage.removeItem('token')
     setUser(null)
   }
 
+// Profile check on initial load
   useEffect(() => {
     const token = localStorage.getItem('token')
     console.log('Token from storage:', token) // Debug log
@@ -95,7 +99,13 @@ export function AuthProvider({ children }) {
 
   return (
     <AuthContext.Provider value={value}>
-      {!loading && children}
+      {loading ? (
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-lg">Loading...</div>
+        </div>
+      ) : (
+        children
+      )}
     </AuthContext.Provider>
   )
 }

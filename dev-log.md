@@ -59,3 +59,13 @@
 - [ ] User customization feature
 - [ ] Test
 
+# 11.07
+- Auth flow
+- Admin dashboard
+- Security improvements
+- Documentation (api endpoint)
+
+## Issues 
+- Error creating service: {"message":"Invalid session"}
+- Once I login to admin, I cannot create a service yet. Still debugging this process 
+- When I return, test and iterate and record logs in console
