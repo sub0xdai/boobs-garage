@@ -3,44 +3,67 @@ import { Link } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import ThemeToggle from './ThemeToggle'
 
-
 function Navbar() {
   const { user, logout } = useAuth()
 
+  console.log('Current user:', user) // Debug log
+
   return (
-    <nav className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
+    <nav className="bg-white dark:bg-gray-800 shadow">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-16">
-          <Link to="/" className="text-xl font-bold">Bob's Garage</Link>
+          <Link to="/" className="text-xl font-bold text-gray-900 dark:text-white">
+            Bob's Garage
+          </Link>
           
-          <div className="hidden md:flex space-x-4 items-center">
-            <Link to="/" className="hover:text-gray-600 dark:hover:text-gray-300">Home</Link>
-            <Link to="/services" className="hover:text-gray-600 dark:hover:text-gray-300">Services</Link>
-            <Link to="/blog" className="hover:text-gray-600 dark:hover:text-gray-300">Blog</Link>
-            <Link to="/contact" className="hover:text-gray-600 dark:hover:text-gray-300">Contact</Link>
+          <div className="hidden md:flex items-center space-x-4">
+            <Link to="/" className="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
+              Home
+            </Link>
+            <Link to="/services" className="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
+              Services
+            </Link>
+            <Link to="/blog" className="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
+              Blog
+            </Link>
+            <Link to="/contact" className="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
+              Contact
+            </Link>
             
             {user ? (
-              <>
+              <div className="flex items-center space-x-4">
                 {user.isAdmin && (
-                  <Link to="/admin" className="hover:text-gray-600 dark:hover:text-gray-300">
-                    Admin Dashboard
+                  <Link 
+                    to="/admin" 
+                    className="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+                  >
+                    Admin 
                   </Link>
                 )}
                 <button 
                   onClick={logout}
-                  className="hover:text-gray-600 dark:hover:text-gray-300"
+                  className="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
                 >
                   Logout
                 </button>
-              </>
+                <ThemeToggle />
+              </div>
             ) : (
-              <Link to="/login" className="hover:text-gray-600 dark:hover:text-gray-300">Login</Link>
+              <div className="flex items-center space-x-4">
+                <Link 
+                  to="/login" 
+                  className="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+                >
+                  Login
+                </Link>
+                <ThemeToggle />
+              </div>
             )}
-            <ThemeToggle />
           </div>
         </div>
       </div>
     </nav>
-  )}
+  )
+}
 
 export default Navbar

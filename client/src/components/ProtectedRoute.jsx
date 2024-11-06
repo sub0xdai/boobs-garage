@@ -1,17 +1,21 @@
 // src/components/ProtectedRoute.jsx
-import { Navigate } from 'react-router-dom'
+import { Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 
-function ProtectedRoute({ children }) {
+const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth()
+  const location = useLocation()
 
   if (loading) {
-    return <div>Loading...</div>
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-2xl">Loading...</div>
+      </div>
+    )
   }
 
   if (!user) {
-    // Redirect to login if not authenticated
-    return <Navigate to="/login" replace />
+    return <Navigate to="/login" state={{ from: location }} replace />
   }
 
   return children

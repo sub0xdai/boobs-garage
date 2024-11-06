@@ -1,17 +1,24 @@
 // src/components/AdminRoute.jsx
-import { Navigate } from 'react-router-dom'
+import { Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 
-function AdminRoute({ children }) {
+const AdminRoute = ({ children }) => {
   const { user, loading } = useAuth()
+  const location = useLocation()
 
   if (loading) {
-    return <div>Loading...</div>
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-900">
+        <div className="text-2xl text-gray-900 dark:text-white">Loading...</div>
+      </div>
+    )
   }
 
+  console.log('AdminRoute - Current user:', user)
+
   if (!user || !user.isAdmin) {
-    // Redirect to home if not admin
-    return <Navigate to="/" replace />
+    console.log('Access denied - Not an admin')
+    return <Navigate to="/" state={{ from: location }} replace />
   }
 
   return children
