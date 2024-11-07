@@ -3,6 +3,11 @@ const API_URL = 'http://localhost:5000'
 
 const fetchWithAuth = async (endpoint, options = {}) => {
   const token = localStorage.getItem('token')
+  console.log('Using token:', token ? 'Present' : 'None')
+
+  if (!token && !endpoint.includes('/login')) {
+    throw new Error('No authentication token')
+  }
   
   const defaultHeaders = {
     'Content-Type': 'application/json',
@@ -18,19 +23,20 @@ const fetchWithAuth = async (endpoint, options = {}) => {
   }
 
   try {
-    console.log('Fetch request:', {
-      url: `${API_URL}${endpoint}`,
-      config
+    console.log('Making request to:', endpoint, 'with config:', {
+      method: config.method,
+      hasToken: !!token
     })
 
     const response = await fetch(`${API_URL}${endpoint}`, config)
     console.log('Fetch response status:', response.status)
 
     // Check if response is ok before trying to parse JSON
-    if (!response.ok) {
-      const errorData = await response.text()
-      console.error('Error response:', errorData)
-      throw new Error(errorData || response.statusText)
+    if (response.status === 401) {
+      // Clear token on auth error
+      localStorage.removeItem('token')
+      window.location.href = '/login'
+      throw new Error('Session expired - please login again')
     }
 
     return response

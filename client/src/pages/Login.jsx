@@ -13,38 +13,20 @@ function Login() {
 
   const onSubmit = async (data) => {
     try {
-      await login(data)
-      const token = localStorage.getItem('token')
-      
-      if (!token) {
-        throw new Error('No token received after login')
-      }
+      const response = await login(data)
+      console.log('Full login response:', response)
 
-      // Fetch user profile to check admin status
-      const response = await fetch('http://localhost:5000/api/auth/profile', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      })
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch user profile')
-      }
-
-      const userData = await response.json()
-      console.log('Login successful, user data:', userData)
-
-      if (userData.isAdmin) {
-        console.log('Admin user detected, redirecting to dashboard')
+      // Check user.isAdmin instead of just isAdmin
+      if (response?.user?.isAdmin) {
+        console.log('Admin user detected, navigating to admin dashboard')
         navigate('/admin')
       } else {
-        // Redirect to the attempted URL or home
-        const from = location.state?.from?.pathname || "/"
-        navigate(from)
+        console.log('Regular user detected, navigating to home')
+        navigate('/')
       }
-    } catch (error) {
-      console.error('Login error:', error)
-      setLoginError('An error occurred during login')
+    } catch (err) {
+      console.error('Login error:', err)
+      setLoginError(err.message || 'Failed to login')
     }
   }
 

@@ -53,19 +53,26 @@
 - Atm light mode doesnt really work, dark mode only effects the navbar. Site is optimised for darkmode but the dark mode doesn't redner across the site
 
 # 11.06
-- [x ] Complete theme context implementation
-- [x ] Complete remaining admin functionality
-- [x ] Add loading states and error handling if appropriate
+- [x] Complete theme context implementation
+- [x] Complete remaining admin functionality
+- [x] Add loading states and error handling if appropriate
 - [ ] User customization feature
-- [ ] Test
+- [x] Test
 
 # 11.07
 - Auth flow
 - Admin dashboard
 - Security improvements
 - Documentation (api endpoint)
+- Enhanced error handling
+- JWT token validation issue 
+- Implemented token refresh mechanism
 
 ## Issues 
 - Error creating service: {"message":"Invalid session"}
-- Once I login to admin, I cannot create a service yet. Still debugging this process 
-- When I return, test and iterate and record logs in console
+- Cannot create a service after logging in as admin. Still debugging this process
+- Testing, iterating, and logging errors in the console
+
+
+## Issues
+- When I log in to admin dashboard, it is not displaying the correct behavior 
