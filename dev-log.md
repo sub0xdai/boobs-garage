@@ -75,4 +75,19 @@
 
 
 ## Issues
-- When I log in to admin dashboard, it is not displaying the correct behavior 
+- When I log in to admin dashboard, it is not displaying the correct behavior
+
+# 11.08
+- Admin dashboard
+- Fixed session middleware authentication by separating user lookup and last_login update to avoid "no such     column" error in SQLite
+- Fixed service creation by adding try-catch blocks for price validation and API requests, resolving syntax errors that blocked form submission
+- Standardized UserManager component by implementing consistent styling with ServicesManager, adding dark mode support, and improving error handling while maintaining core user management functionality
+
+## Issues 
+    Issue: useAuth must be used within an AuthProvider error when using useAuth in the Navbar component.
+    Cause: Navbar component is attempting to access authentication context outside of the AuthProvider.
+    Error Locations:
+        useAuth.js:8
+        Navbar.jsx:23
+    Current Action: Working on the blog section of the admin dashboard, implementing authentication-related features (user sessions, JWT tokens).
+    Additional Errors: Issues with React's source maps and connections to Vite hot reloading.

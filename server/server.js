@@ -18,9 +18,12 @@ const cors = require('cors');
 const helmet = require('helmet');
 
 const app = express();
+
+// Import routes
 const serviceRoutes = require('./src/routes/serviceRoutes');
 const feedbackRoutes = require('./src/routes/feedbackRoutes');
 const authRoutes = require('./src/routes/authRoutes');
+const blogRoutes = require('./src/routes/blogRoutes');
 
 // Middleware
 app.use(helmet());
@@ -31,7 +34,7 @@ app.use('/api/feedback', feedbackRoutes);
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/services', serviceRoutes);
-
+app.use('/api/blog', blogRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

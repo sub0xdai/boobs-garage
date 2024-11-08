@@ -1,4 +1,4 @@
-// server/src/config/database.js
+
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 const bcrypt = require('bcryptjs');
@@ -11,13 +11,16 @@ const db = new sqlite3.Database(dbPath, async (err) => {
     return;
   }
   console.log('Connected to SQLite database');
-  
+
   // Enable foreign keys
   db.run('PRAGMA foreign_keys = ON');
   
   // Create tables if they don't exist
-  initializeTables();
-  
+  await initializeTables();
+
+  // Add the last_login column if it doesn't exist
+  await addLastLoginColumn();
+
   // Create admin user after tables are created
   try {
     await createAdminUser();
@@ -26,6 +29,31 @@ const db = new sqlite3.Database(dbPath, async (err) => {
     console.error('Error creating admin user:', error);
   }
 });
+
+// Function to add the last_login column if it doesn't already exist
+function addLastLoginColumn() {
+  return new Promise((resolve, reject) => {
+    db.all("PRAGMA table_info(users);", (err, rows) => {
+      if (err) {
+        return reject(err);
+      }
+      
+      const hasLastLogin = rows.some(row => row.name === 'last_login');
+      if (!hasLastLogin) {
+        db.run("ALTER TABLE users ADD COLUMN last_login TEXT;", (err) => {
+          if (err) {
+            console.error('Error adding last_login column:', err);
+            return reject(err);
+          }
+          console.log('Added last_login column to users table');
+          resolve();
+        });
+      } else {
+        resolve();
+      }
+    });
+  });
+}
 
 // Create admin user function as a Promise
 function createAdminUser() {
@@ -87,7 +115,7 @@ function initializeTables() {
       token TEXT NOT NULL,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (user_id) REFERENCES users(id)
-  )`,
+    )`,
     `CREATE TABLE IF NOT EXISTS feedback (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       user_id INTEGER,
@@ -107,3 +135,4 @@ function initializeTables() {
 }
 
 module.exports = db;
+

@@ -5,49 +5,44 @@ const db = require('../config/database');
 const sessionMiddleware = async (req, res, next) => {
   try {
     const authHeader = req.header('Authorization');
-    console.log('Auth header:', authHeader); // Debug log
-
-    const token = authHeader?.replace('Bearer ', '');
-    if (!token) {
-      console.log('No token provided'); // Debug log
+    console.log('Auth header:', authHeader);
+    
+    if (!authHeader?.startsWith('Bearer ')) {
+      console.log('No token provided or invalid format');
       return res.status(401).json({ message: 'No token provided' });
     }
 
-    // Verify token
+    const token = authHeader.replace('Bearer ', '');
+    
     let decoded;
     try {
       decoded = jwt.verify(token, process.env.JWT_SECRET);
-      console.log('Decoded token:', decoded); // Debug log
+      console.log('Decoded token:', decoded);
     } catch (jwtError) {
       console.error('JWT verification error:', jwtError);
       return res.status(401).json({ message: 'Invalid token' });
     }
 
-    // Check user in database
+    // First verify the user exists without the last_login field
     db.get(
-      'SELECT id, username, email, is_admin, last_login FROM users WHERE id = ?',
+      'SELECT id, username, email, is_admin FROM users WHERE id = ?',
       [decoded.user.id],
       (err, user) => {
         if (err) {
-          console.error('Database error:', err); // Debug log
+          console.error('Database error:', err);
           return res.status(500).json({ message: 'Server error' });
         }
-
+        
         if (!user) {
-          console.log('User not found:', decoded.user.id); // Debug log
+          console.log('User not found:', decoded.user.id);
           return res.status(401).json({ message: 'Invalid session' });
         }
 
-        console.log('Found user:', { 
-          id: user.id, 
-          email: user.email, 
-          isAdmin: Boolean(user.is_admin) 
-        }); // Debug log
-        
-        // Update last_login
+        // Update last_login in a separate query
+        const now = new Date().toISOString();
         db.run(
           'UPDATE users SET last_login = ? WHERE id = ?',
-          [new Date().toISOString(), user.id],
+          [now, user.id],
           (updateErr) => {
             if (updateErr) {
               console.error('Error updating last_login:', updateErr);
@@ -62,15 +57,15 @@ const sessionMiddleware = async (req, res, next) => {
           username: user.username,
           email: user.email,
           isAdmin: Boolean(user.is_admin),
-          lastLogin: user.last_login
+          lastLogin: now  // Use the current time since we just updated it
         };
 
-        console.log('User attached to request:', req.user); // Debug log
+        console.log('User attached to request:', req.user);
         next();
       }
     );
   } catch (error) {
-    console.error('Session middleware error:', error); // Debug log
+    console.error('Session middleware error:', error);
     res.status(401).json({ message: 'Invalid token' });
   }
 };

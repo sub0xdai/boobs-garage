@@ -60,61 +60,74 @@ function ServicesManager() {
   }, [user, navigate, logout]);
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target
+  const { name, value } = e.target;
+  
+  // Special handling for price field
+  if (name === 'price') {
+    // Only accept valid numbers and empty string
+    if (value === '' || !isNaN(value)) {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
+  } else {
     setFormData(prev => ({
       ...prev,
       [name]: value
-    }))
+    }));
+  }
+}
+
+const handleCreateService = async (e) => {
+  e.preventDefault();
+  
+  // Validate price before submission
+  const price = parseFloat(formData.price);
+  if (isNaN(price)) {
+    setError('Please enter a valid number for price');
+    return;
   }
 
-  const handleCreateService = async (e) => {
-    e.preventDefault()
+  try {
+    const serviceData = {
+      name: formData.name,
+      description: formData.description,
+      price: price
+    };
+    console.log('Creating service with data:', serviceData);
+
+    const response = await api.post('/api/services', serviceData);
+    console.log('Service creation response:', response);
+    
+    let data;
     try {
-      const serviceData = {
-        name: formData.name,
-        description: formData.description,
-        price: parseFloat(formData.price)
-      }
-      console.log('Creating service with data:', serviceData)
+      data = await response.json();
+    } catch (parseError) {
+      console.error('Error parsing response:', parseError);
+      throw new Error('Failed to create service: Invalid server response');
+    }
 
-      const response = await api.post('/api/services', serviceData)
-      let errorMessage;
-      
-      try {
-        const data = await response.json();
-        errorMessage = data.message;
-      } catch (e) {
-        errorMessage = 'Failed to create service';
-      }
-      
-      if (!response.ok) {
-        if (response.status === 401) {
-          logout();
-          navigate('/login');
-          throw new Error('Session expired - please login again');
-        }
-        throw new Error(errorMessage);
-      }
+    if (!response.ok) {
+      throw new Error(data.message || 'Failed to create service');
+    }
 
-      const data = await response.json();
-      console.log('Create service response:', data);
-
-      setServices(prev => [...prev, data]);
-      setFormData({ name: '', description: '', price: '' });
-      setError(null);
-      setSuccessMessage('Service created successfully!');
-      setTimeout(() => setSuccessMessage(null), 3000);
-    } catch (err) {
-      console.error('Create service error:', err);
-      setError(`Error creating service: ${err.message}`);
-      
-      if (err.message.includes('session') || err.message.includes('token')) {
-        logout();
-        navigate('/login');
-      }
+    setServices(prev => [...prev, data]);
+    setFormData({ name: '', description: '', price: '' });
+    setError(null);
+    setSuccessMessage('Service created successfully!');
+    setTimeout(() => setSuccessMessage(null), 3000);
+  } catch (error) {
+    console.error('Create service error:', error);
+    setError(`Error creating service: ${error.message}`);
+    
+    if (error.message.includes('session') || error.message.includes('token')) {
+      logout();
+      navigate('/login');
     }
   }
-
+};
+// Update
   const handleUpdateService = async (e) => {
     e.preventDefault()
     try {
@@ -147,6 +160,7 @@ function ServicesManager() {
     }
   }
 
+// Delete
   const handleDeleteService = async (serviceId) => {
     if (!window.confirm('Are you sure you want to delete this service?')) return
 

@@ -1,50 +1,57 @@
 // src/utils/fetchWithAuth.js
 const API_URL = 'http://localhost:5000'
 
-const fetchWithAuth = async (endpoint, options = {}) => {
-  const token = localStorage.getItem('token')
-  console.log('Using token:', token ? 'Present' : 'None')
+const refreshToken = async () => {
+  const response = await fetch(`${API_URL}/auth/refresh`, { method: 'POST' });
+  if (!response.ok) throw new Error('Unable to refresh token');
 
+  const { accessToken } = await response.json();
+  localStorage.setItem('token', accessToken);
+  return accessToken;
+};
+
+
+
+const fetchWithAuth = async (endpoint, options = {}) => {
+  let token = localStorage.getItem('token');
   if (!token && !endpoint.includes('/login')) {
-    throw new Error('No authentication token')
-  }
-  
-  const defaultHeaders = {
-    'Content-Type': 'application/json',
-    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+    throw new Error('No authentication token');
   }
 
   const config = {
     ...options,
     headers: {
-      ...defaultHeaders,
+      'Content-Type': 'application/json',
+      ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
       ...options.headers
     }
-  }
+  };
 
   try {
-    console.log('Making request to:', endpoint, 'with config:', {
-      method: config.method,
-      hasToken: !!token
-    })
-
-    const response = await fetch(`${API_URL}${endpoint}`, config)
-    console.log('Fetch response status:', response.status)
-
-    // Check if response is ok before trying to parse JSON
+    let response = await fetch(`${API_URL}${endpoint}`, config);
     if (response.status === 401) {
-      // Clear token on auth error
-      localStorage.removeItem('token')
-      window.location.href = '/login'
-      throw new Error('Session expired - please login again')
+      localStorage.removeItem('token');
+
+      // Attempt to refresh the token
+      try {
+        token = await refreshToken();
+        config.headers.Authorization = `Bearer ${token}`;
+        response = await fetch(`${API_URL}${endpoint}`, config);
+      } catch (error) {
+        // Redirect to login if refresh fails
+        window.location.href = '/login';
+        throw new Error('Session expired - please login again');
+      }
     }
 
-    return response
+    if (!response.ok) throw new Error(`Error: ${response.statusText}`);
+    return response;
   } catch (error) {
-    console.error('Fetch error:', error)
-    throw error
+    console.error('Fetch error:', error);
+    throw error;
   }
-}
+};
+
 
 export const api = {
   get: (endpoint) => fetchWithAuth(endpoint),
