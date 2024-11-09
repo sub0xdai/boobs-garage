@@ -17,7 +17,7 @@ function Navbar() {
           </Link>
           
           <div className="hidden md:flex items-center space-x-4">
-            <Link to="/" className="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
+             <Link to="/" className="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
               Home
             </Link>
             <Link to="/services" className="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
@@ -29,6 +29,8 @@ function Navbar() {
             <Link to="/contact" className="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
               Contact
             </Link>
+            <Link to="/feedback" className="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"> Feedback </Link>
+
             
             {user ? (
               <div className="flex items-center space-x-4">

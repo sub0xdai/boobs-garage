@@ -91,3 +91,13 @@
         Navbar.jsx:23
     Current Action: Working on the blog section of the admin dashboard, implementing authentication-related features (user sessions, JWT tokens).
     Additional Errors: Issues with React's source maps and connections to Vite hot reloading.
+
+# 11.09
+- Resolved issues with AuthProvider and useAuth
+- Fixed styling issues 
+- All admin components are now standardised and seemingly work 
+- Created feedback section and button on navbar
+- 
+
+## Issues
+- File uploads are causing a 500 error due to server misconfiguration in handling or storing uploaded files

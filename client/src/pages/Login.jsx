@@ -1,3 +1,4 @@
+
 // src/pages/Login.jsx
 import { useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
@@ -47,7 +48,7 @@ function Login() {
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Email
             </label>
-            <input 
+            <input
               {...register('email', { 
                 required: 'Email is required',
                 pattern: {
@@ -55,10 +56,10 @@ function Login() {
                   message: 'Invalid email address'
                 }
               })}
-              type="email" 
+              type="email"
               className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 
-                dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500 dark:placeholder-gray-400
-                ${errors.email ? 'border-red-500 dark:border-red-500' : 'border-gray-300 dark:border-gray-600'}`}
+                          bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white 
+                          ${errors.email ? 'border-red-500 dark:border-red-500' : ''}`}
               placeholder="your@email.com"
             />
             {errors.email && (
@@ -70,7 +71,7 @@ function Login() {
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Password
             </label>
-            <input 
+            <input
               {...register('password', { 
                 required: 'Password is required',
                 minLength: {
@@ -78,10 +79,10 @@ function Login() {
                   message: 'Password must be at least 6 characters'
                 }
               })}
-              type="password" 
+              type="password"
               className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 
-                dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500 dark:placeholder-gray-400
-                ${errors.password ? 'border-red-500 dark:border-red-500' : 'border-gray-300 dark:border-gray-600'}`}
+                          bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white 
+                          ${errors.password ? 'border-red-500 dark:border-red-500' : ''}`}
               placeholder="••••••••"
             />
             {errors.password && (
@@ -91,10 +92,10 @@ function Login() {
 
           <div className="flex items-center justify-between">
             <div className="flex items-center">
-              <input 
-                type="checkbox" 
+              <input
+                type="checkbox"
                 className="h-4 w-4 text-blue-600 dark:text-blue-500 border-gray-300 dark:border-gray-600 rounded
-                         focus:ring-blue-500 dark:focus:ring-blue-400 bg-white dark:bg-gray-700"
+                           focus:ring-blue-500 dark:focus:ring-blue-400 bg-white dark:bg-gray-700"
               />
               <label className="ml-2 text-sm text-gray-600 dark:text-gray-400">Remember me</label>
             </div>
@@ -103,10 +104,10 @@ function Login() {
             </a>
           </div>
 
-          <button 
+          <button
             type="submit"
             className="w-full bg-blue-600 dark:bg-blue-500 text-white py-2 px-4 rounded-md 
-                     hover:bg-blue-700 dark:hover:bg-blue-600 transition"
+                       hover:bg-blue-700 dark:hover:bg-blue-600 transition"
           >
             Sign In
           </button>
@@ -126,3 +127,4 @@ function Login() {
 }
 
 export default Login
+
