@@ -1,9 +1,21 @@
-
 import sqlite3 from 'sqlite3';
 import path from 'path';
 import bcrypt from 'bcryptjs';
+import { fileURLToPath } from 'url';
+import fs from 'fs';
 
-const dbPath = path.resolve('..', 'db', 'bobs_garage.sqlite');
+// Get current file path
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Ensure db directory exists
+const dbDir = path.resolve(__dirname, '../../db');
+if (!fs.existsSync(dbDir)) {
+  fs.mkdirSync(dbDir, { recursive: true });
+}
+
+const dbPath = path.resolve(dbDir, 'bobs_garage.sqlite');
+console.log('Database path:', dbPath); // Debug log
 const db = new sqlite3.Database(dbPath, async (err) => {
   if (err) {
     console.error('Error connecting to the database:', err);

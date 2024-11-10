@@ -69,13 +69,13 @@
 - Implemented token refresh mechanism
 
 ## Issues 
-- Error creating service: {"message":"Invalid session"}
-- Cannot create a service after logging in as admin. Still debugging this process
-- Testing, iterating, and logging errors in the console
+- Error creating service: {"message":"Invalid session"} - resolved
+- Cannot create a service after logging in as admin. Still debugging this process - resolved
+- Testing, iterating, and logging errors in the console -resolved
 
 
 ## Issues
-- When I log in to admin dashboard, it is not displaying the correct behavior
+- When I log in to admin dashboard, it is not displaying the correct behavio - resolved
 
 # 11.08
 - Admin dashboard
@@ -101,7 +101,7 @@
 
 ## Issues
 - File uploads are causing a 500 error due to server misconfiguration in handling or storing uploaded files
-- Logout returns 401 Unauthorized, possibly due to missing session/token clearance, frontend state not updating, or incorrect CORS/cookie settings
+- Logout returns 401 Unauthorized, possibly due to missing session/token clearance, frontend state not updating, or incorrect CORS/cookie settings - resolved
 
 # 11.10
 - Fix issues
@@ -110,4 +110,4 @@
 - Refactored code to ES from common JS on server side
 
 ## Issues 
-- Error likely caused by improper handling of asynchronous database connections or incorrect module imports/exports after refactoring to ES modules. DB not connecting after refactoring
+- Error likely caused by improper handling of asynchronous database connections or incorrect module imports/exports after refactoring to ES modules. DB not connecting after refactoring - resolved

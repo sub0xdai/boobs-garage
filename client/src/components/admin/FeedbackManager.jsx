@@ -194,12 +194,15 @@ function FeedbackManager() {
               <div className="mt-4">
                 <p className="text-gray-700 dark:text-gray-300">{item.content}</p>
                 {item.image_url && (
-                  <img 
-                    src={item.image_url} 
-                    alt="Feedback attachment" 
-                    className="mt-4 max-h-48 w-full object-cover rounded"
-                  />
-                )}
+                   <div className="mt-4">
+                     <img 
+                      src={`http://localhost:5000${item.image_url}`}
+                      alt="Feedback attachment" 
+                      className="mt-4 max-h-48 w-auto object-cover rounded-lg shadow-md hover:opacity-90 transition-opacity cursor-pointer"
+                      onClick={() => window.open(`http://localhost:5000${item.image_url}`, '_blank')}
+                   />
+               </div>
+              )}
               </div>
             </div>
           ))

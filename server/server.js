@@ -1,22 +1,15 @@
-
 import dotenv from 'dotenv';
-dotenv.config();
-
-// Run environment check on startup
-const requiredEnvVars = ['PORT', 'JWT_SECRET', 'REFRESH_TOKEN_SECRET'];
-const missingEnvVars = requiredEnvVars.filter(varName => !process.env[varName]);
-
-if (missingEnvVars.length > 0) {
-  console.error('Missing required environment variables. Running env manager...');
-  import('./scripts/manageEnv.js'); // Use dynamic import
-  // Reload environment variables
-  dotenv.config();
-}
-
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import path from 'path';
+import { fileURLToPath } from 'url';
+
+dotenv.config();
+
+// ES module path fix
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Import routes
 import serviceRoutes from './src/routes/serviceRoutes.js';
@@ -24,14 +17,24 @@ import feedbackRoutes from './src/routes/feedbackRoutes.js';
 import authRoutes from './src/routes/authRoutes.js';
 import blogRoutes from './src/routes/blogRoutes.js';
 
-// Middleware
+// Create uploads directory if it doesn't exist
+import fs from 'fs';
+const uploadDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
 const app = express();
-app.use(helmet());
+
+// Middleware
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" } // Allow image loading
+}));
 app.use(cors());
 app.use(express.json());
 
-// Static file serving
-app.use('/uploads', express.static(path.join(path.resolve(), 'uploads')));
+// Static file serving - updated path
+app.use('/uploads', express.static(uploadDir));
 
 // Routes
 app.use('/api/auth', authRoutes);
