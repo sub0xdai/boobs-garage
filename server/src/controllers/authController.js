@@ -1,8 +1,8 @@
 
 // server/src/controllers/authController.js
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const db = require('../config/database');
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import db from '../config/database.js';
 
 const authController = {
   // Register user
@@ -136,49 +136,49 @@ const authController = {
 
   // Token-based login
   loginWithTokens: async (req, res) => {
-  const { email, password } = req.body;
+    const { email, password } = req.body;
 
-  try {
-    db.get('SELECT * FROM users WHERE email = ?', [email], async (err, user) => {
-      if (err) return res.status(500).json({ message: 'Database error' });
-      if (!user) return res.status(401).json({ message: 'Invalid credentials' });
+    try {
+      db.get('SELECT * FROM users WHERE email = ?', [email], async (err, user) => {
+        if (err) return res.status(500).json({ message: 'Database error' });
+        if (!user) return res.status(401).json({ message: 'Invalid credentials' });
 
-      // Add password check
-      const isMatch = await bcrypt.compare(password, user.password_hash);
-      if (!isMatch) return res.status(401).json({ message: 'Invalid credentials' });
+        // Add password check
+        const isMatch = await bcrypt.compare(password, user.password_hash);
+        if (!isMatch) return res.status(401).json({ message: 'Invalid credentials' });
 
-      // Create tokens
-      const token = jwt.sign(
-        { user: { id: user.id, email: user.email, isAdmin: Boolean(user.is_admin) } },
-        process.env.JWT_SECRET,
-        { expiresIn: '15m' }
-      );
-      
-      const refreshToken = jwt.sign(
-        { userId: user.id }, 
-        process.env.REFRESH_TOKEN_SECRET, 
-        { expiresIn: '7d' }
-      );
+        // Create tokens
+        const token = jwt.sign(
+          { user: { id: user.id, email: user.email, isAdmin: Boolean(user.is_admin) } },
+          process.env.JWT_SECRET,
+          { expiresIn: '15m' }
+        );
+        
+        const refreshToken = jwt.sign(
+          { userId: user.id }, 
+          process.env.REFRESH_TOKEN_SECRET, 
+          { expiresIn: '7d' }
+        );
 
-      // Store refresh token
-      db.run('INSERT INTO refresh_tokens (user_id, token) VALUES (?, ?)', [user.id, refreshToken], (err) => {
-        if (err) return res.status(500).json({ message: 'Error storing refresh token' });
-        res.json({ 
-          token, 
-          refreshToken, 
-          user: { 
-            id: user.id, 
-            email: user.email, 
-            isAdmin: Boolean(user.is_admin) 
-          } 
+        // Store refresh token
+        db.run('INSERT INTO refresh_tokens (user_id, token) VALUES (?, ?)', [user.id, refreshToken], (err) => {
+          if (err) return res.status(500).json({ message: 'Error storing refresh token' });
+          res.json({ 
+            token, 
+            refreshToken, 
+            user: { 
+              id: user.id, 
+              email: user.email, 
+              isAdmin: Boolean(user.is_admin) 
+            } 
+          });
         });
       });
-    });
-  } catch (error) {
-    console.error('Login error:', error);
-    res.status(500).json({ message: 'Server error' });
-  }
-},
+    } catch (error) {
+      console.error('Login error:', error);
+      res.status(500).json({ message: 'Server error' });
+    }
+  },
 
   // Refresh token
   refreshToken: async (req, res) => {
@@ -208,17 +208,28 @@ const authController = {
 
   // Logout
   logout: async (req, res) => {
-    const { refreshToken } = req.body;
     try {
+      const refreshToken = req.body.refreshToken;
+      
+      if (!refreshToken) {
+        return res.status(200).json({ message: 'Logged out' });
+      }
+
+      // Delete refresh token from database
       db.run('DELETE FROM refresh_tokens WHERE token = ?', [refreshToken], (err) => {
-        if (err) return res.status(500).json({ message: 'Error during logout' });
-        res.json({ message: 'Logged out successfully' });
+        if (err) {
+          console.error('Error deleting refresh token:', err);
+          // Still return success - user is logged out client-side
+        }
+        res.status(200).json({ message: 'Successfully logged out' });
       });
     } catch (error) {
-      res.status(500).json({ message: 'Server error' });
+      console.error('Logout error:', error);
+      // Still return success - user is logged out client-side
+      res.status(200).json({ message: 'Logged out' });
     }
   }
 };
 
-module.exports = authController;
+export default authController;
 

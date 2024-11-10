@@ -1,10 +1,9 @@
 
-const sqlite3 = require('sqlite3').verbose();
-const path = require('path');
-const bcrypt = require('bcryptjs');
+import sqlite3 from 'sqlite3';
+import path from 'path';
+import bcrypt from 'bcryptjs';
 
-const dbPath = path.resolve(__dirname, '../db/bobs_garage.sqlite');
-
+const dbPath = path.resolve('..', 'db', 'bobs_garage.sqlite');
 const db = new sqlite3.Database(dbPath, async (err) => {
   if (err) {
     console.error('Error connecting to the database:', err);
@@ -49,6 +48,25 @@ function addLastLoginColumn() {
           resolve();
         });
       } else {
+        resolve();
+      }
+    });
+  });
+}
+
+function addStatusColumn(db) {
+  return new Promise((resolve, reject) => {
+    db.run(`ALTER TABLE feedback ADD COLUMN status TEXT DEFAULT 'pending'`, (err) => {
+      if (err) {
+        // If error is about column already existing, that's fine
+        if (err.message.includes('duplicate column name')) {
+          resolve();
+          return;
+        }
+        console.error('Error adding status column:', err);
+        reject(err);
+      } else {
+        console.log('Status column added successfully');
         resolve();
       }
     });
@@ -120,6 +138,7 @@ function initializeTables() {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       user_id INTEGER,
       content TEXT NOT NULL,
+      status TEXT DEFAULT 'pending',
       image_url TEXT,
       created_at TEXT NOT NULL,
       FOREIGN KEY (user_id) REFERENCES users(id)
@@ -134,5 +153,5 @@ function initializeTables() {
   });
 }
 
-module.exports = db;
+export default db;
 

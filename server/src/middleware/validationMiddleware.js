@@ -1,5 +1,6 @@
+
 // server/src/middleware/validationMiddleware.js
-const { body, validationResult } = require('express-validator');
+import { body, validationResult } from 'express-validator';
 
 const loginValidation = [
   body('email').isEmail().normalizeEmail(),
@@ -30,8 +31,9 @@ const validate = (req, res, next) => {
   next();
 };
 
-module.exports = {
+export {
   loginValidation,
   registerValidation,
-  validate,
+  validate
 };
+

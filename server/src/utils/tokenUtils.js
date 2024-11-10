@@ -1,5 +1,6 @@
+
 // server/src/utils/tokenUtils.js
-const jwt = require('jsonwebtoken');
+import jwt from 'jsonwebtoken';
 
 const verifyToken = (token) => {
   try {
@@ -17,4 +18,5 @@ const parseAuthHeader = (authHeader) => {
   return authHeader.replace('Bearer ', '');
 };
 
-module.exports = { verifyToken, parseAuthHeader };
+export { verifyToken, parseAuthHeader };
+

@@ -1,13 +1,23 @@
 // src/context/AuthContext.jsx
 import { createContext, useState, useEffect } from 'react'
 import { api } from '../utils/fetchWithAuth.js'
+import { useNavigate } from 'react-router-dom'
 
 const AuthContext = createContext(null)
+
+export function useAuth() {
+  const context = React.useContext(AuthContext)
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider')
+  }
+  return context
+}
+
 
 function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
-
+  const navigate = useNavigate();
   
 const login = async (credentials) => {
   try {
@@ -75,23 +85,29 @@ const login = async (credentials) => {
   }
 
   const logout = async () => {
-    try {
-      const refreshToken = localStorage.getItem('refreshToken')
-      if (refreshToken) {
-        await fetch('http://localhost:5000/api/auth/logout', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ refreshToken })
+  try {
+    // Clear state and storage immediately for better UX
+    setUser(null)
+    localStorage.removeItem('token')
+    localStorage.removeItem('refreshToken')
+
+    const refreshToken = localStorage.getItem('refreshToken')
+    if (refreshToken) {
+      // Use api utility for consistency and error handling
+      await api.post('/api/auth/logout', { refreshToken })
+        .catch(err => {
+          // Log but don't throw - user is already logged out locally
+          console.error('Server logout failed:', err)
         })
-      }
-    } catch (error) {
-      console.error('Logout error:', error)
-    } finally {
-      localStorage.removeItem('token')
-      localStorage.removeItem('refreshToken')
-      setUser(null)
     }
+
+    // Navigate after logout
+    navigate('/')
+  } catch (error) {
+    console.error('Logout error:', error)
+    // No need to handle error since user is already logged out locally
   }
+}
 
   // Add initial auth check
   useEffect(() => {

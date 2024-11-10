@@ -1,9 +1,11 @@
+
 // server/src/routes/serviceRoutes.js
-const express = require('express');
+import express from 'express';
+import db from '../config/database.js';
+import authMiddleware from '../middleware/sessionMiddleware.js';
+import adminMiddleware from '../middleware/adminMiddleware.js';
+
 const router = express.Router();
-const db = require('../config/database');
-const authMiddleware = require('../middleware/sessionMiddleware');
-const adminMiddleware = require('../middleware/adminMiddleware');
 
 // Get all services
 router.get('/', async (req, res) => {
@@ -97,4 +99,5 @@ router.delete('/:id', authMiddleware, adminMiddleware, async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;
+

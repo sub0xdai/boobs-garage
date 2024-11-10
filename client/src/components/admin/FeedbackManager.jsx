@@ -82,8 +82,9 @@ function FeedbackManager() {
     if (!window.confirm('Are you sure you want to delete this feedback?')) return;
 
     try {
+      console.log('Attempting to delete feedback:', id);
       const response = await api.delete(`/api/feedback/${id}`);
-      
+       
       if (!response.ok) {
         const data = await response.json();
         throw new Error(data.message || 'Failed to delete feedback');

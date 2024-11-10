@@ -1,5 +1,4 @@
-// server/scripts/manageEnv.js
-const fs = require('fs');
+// server/scripts/manageEnv.js const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 
@@ -26,7 +25,7 @@ const parseEnv = (content) => {
     if (key) {
       env[key.trim()] = values.join('=').trim();
     }
-  });
+  };
   return env;
 };
 

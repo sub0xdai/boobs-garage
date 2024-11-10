@@ -1,19 +1,20 @@
+
 // server/src/middleware/sessionMiddleware.js
-const jwt = require('jsonwebtoken');
-const db = require('../config/database');
+import jwt from 'jsonwebtoken';
+import db from '../config/database.js';
 
 const sessionMiddleware = async (req, res, next) => {
   try {
     const authHeader = req.header('Authorization');
     console.log('Auth header:', authHeader);
-    
+
     if (!authHeader?.startsWith('Bearer ')) {
       console.log('No token provided or invalid format');
       return res.status(401).json({ message: 'No token provided' });
     }
 
     const token = authHeader.replace('Bearer ', '');
-    
+
     let decoded;
     try {
       decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -32,7 +33,7 @@ const sessionMiddleware = async (req, res, next) => {
           console.error('Database error:', err);
           return res.status(500).json({ message: 'Server error' });
         }
-        
+
         if (!user) {
           console.log('User not found:', decoded.user.id);
           return res.status(401).json({ message: 'Invalid session' });
@@ -70,4 +71,5 @@ const sessionMiddleware = async (req, res, next) => {
   }
 };
 
-module.exports = sessionMiddleware;
+export default sessionMiddleware;
+

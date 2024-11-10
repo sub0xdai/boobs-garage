@@ -97,7 +97,17 @@
 - Fixed styling issues 
 - All admin components are now standardised and seemingly work 
 - Created feedback section and button on navbar
-- 
+- Feedback form works admin and client side (yet to try to post with image) 
 
 ## Issues
 - File uploads are causing a 500 error due to server misconfiguration in handling or storing uploaded files
+- Logout returns 401 Unauthorized, possibly due to missing session/token clearance, frontend state not updating, or incorrect CORS/cookie settings
+
+# 11.10
+- Fix issues
+- Verify feedback management 
+- UI improvements
+- Refactored code to ES from common JS on server side
+
+## Issues 
+- Error likely caused by improper handling of asynchronous database connections or incorrect module imports/exports after refactoring to ES modules. DB not connecting after refactoring

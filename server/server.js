@@ -1,5 +1,6 @@
-// server/src/server.js or index.js
-require('dotenv').config();
+
+import dotenv from 'dotenv';
+dotenv.config();
 
 // Run environment check on startup
 const requiredEnvVars = ['PORT', 'JWT_SECRET', 'REFRESH_TOKEN_SECRET'];
@@ -7,29 +8,30 @@ const missingEnvVars = requiredEnvVars.filter(varName => !process.env[varName]);
 
 if (missingEnvVars.length > 0) {
   console.error('Missing required environment variables. Running env manager...');
-  require('./scripts/manageEnv.js');
+  import('./scripts/manageEnv.js'); // Use dynamic import
   // Reload environment variables
-  require('dotenv').config();
+  dotenv.config();
 }
 
-
-const express = require('express');
-const cors = require('cors');
-const helmet = require('helmet');
-
-const app = express();
+import express from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import path from 'path';
 
 // Import routes
-const serviceRoutes = require('./src/routes/serviceRoutes');
-const feedbackRoutes = require('./src/routes/feedbackRoutes');
-const authRoutes = require('./src/routes/authRoutes');
-const blogRoutes = require('./src/routes/blogRoutes');
+import serviceRoutes from './src/routes/serviceRoutes.js';
+import feedbackRoutes from './src/routes/feedbackRoutes.js';
+import authRoutes from './src/routes/authRoutes.js';
+import blogRoutes from './src/routes/blogRoutes.js';
 
 // Middleware
+const app = express();
 app.use(helmet());
 app.use(cors());
 app.use(express.json());
-app.use('/api/feedback', feedbackRoutes);
+
+// Static file serving
+app.use('/uploads', express.static(path.join(path.resolve(), 'uploads')));
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -48,3 +50,4 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
