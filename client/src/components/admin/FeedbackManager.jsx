@@ -11,6 +11,7 @@ function FeedbackManager() {
   const [error, setError] = useState(null)
   const [successMessage, setSuccessMessage] = useState(null)
   const [statusFilter, setStatusFilter] = useState('all')
+  const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
     let mounted = true;
@@ -52,6 +53,29 @@ function FeedbackManager() {
       mounted = false;
     };
   }, [user, navigate, logout]);
+
+  useEffect(() => {
+    if (!user?.isAdmin) return;
+
+    const checkUnread = async () => {
+      try {
+        const response = await api.get('/api/feedback/unread');
+        const data = await response.json();
+        
+        if (response.ok) {
+          setUnreadCount(data.length);
+        }
+      } catch (error) {
+        console.error('Error checking unread feedback:', error);
+      }
+    };
+
+    const interval = setInterval(checkUnread, 30000);
+    checkUnread();
+
+    return () => clearInterval(interval);
+  }, [user]);
+
 
   const handleUpdateStatus = async (id, status) => {
     try {
@@ -124,6 +148,15 @@ function FeedbackManager() {
       {successMessage && (
         <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
           {successMessage}
+        </div>
+      )}
+
+      {unreadCount > 0 && (
+        <div className="bg-blue-100 dark:bg-blue-900 border border-blue-400 
+                     dark:border-blue-700 text-blue-700 dark:text-blue-200 
+                     px-4 py-3 rounded relative">
+          <strong className="font-bold">New Feedback!</strong>
+          <span className="block sm:inline"> You have {unreadCount} pending feedback items.</span>
         </div>
       )}
 

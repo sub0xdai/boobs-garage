@@ -111,3 +111,74 @@
 
 ## Issues 
 - Error likely caused by improper handling of asynchronous database connections or incorrect module imports/exports after refactoring to ES modules. DB not connecting after refactoring - resolved
+
+# Task List
+
+## Critical Features
+1. Feedback System
+   - [x] Test feedback creation with images
+   - [x] Verify admin feedback management (delete working)
+   - [x] Test feedback notifications
+
+2. Blog System
+   - [ ] Complete blog post creation with images
+   - [ ] Test blog post editing
+   - [ ] Verify blog deletion
+   - [ ] Add blog listing page
+
+3. Services Page
+   - [ ] Complete price updates functionality
+   - [ ] Add service categories (if required)
+   - [ ] Test service image uploads
+
+## Authentication & Security
+1. User Management
+   - [ ] Verify password reset flow
+   - [ ] Test user profile updates
+   - [ ] Complete admin user management
+
+2. Authorization
+   - [ ] Test role-based access
+   - [ ] Verify protected routes
+   - [ ] Test token refresh mechanism
+
+## UI/UX
+1. Dark Mode
+   - [ ] Test all components in dark mode
+   - [ ] Fix any remaining dark mode issues
+
+2. Responsive Design
+   - [ ] Test on mobile devices
+   - [ ] Test tablet layouts
+   - [ ] Fix any responsive issues
+
+## Testing
+1. Integration Tests
+   - [ ] Test all API endpoints
+   - [ ] Test file uploads
+   - [ ] Test auth flows
+
+2. Error Handling
+   - [ ] Add error boundaries
+   - [ ] Improve error messages
+   - [ ] Test network error scenarios
+
+## Final Steps
+1. Cleanup
+   - [ ] Remove console.logs
+   - [ ] Clean up comments
+   - [ ] Organize imports
+
+2. Documentation
+   - [ ] Update README
+   - [ ] Add API documentation
+   - [ ] Add setup instructions
+
+
+# 11.11
+_Blog Posts_
+- Image URL instead of upload 
+- Does not reflect on client side 
+- Blog functionality is just placeholders for now, need to add dynamic functionality
+- Will need to do similar for services
+- After this is just testing and cleanup

@@ -122,7 +122,32 @@ router.get('/', authMiddleware, async (req, res) => {
     db.all(
       `SELECT feedback.*, users.username 
        FROM feedback 
-       LEFT JOIN users ON feedback.user_id = users.id 
+       LEFT JOIN users ON feedback.user_id = users.id
+       ORDER BY created_at DESC`,
+      [],
+      (err, feedback) => {
+        if (err) {
+          console.error('Database error:', err);
+          return res.status(500).json({ message: 'Error fetching feedback' });
+        }
+        res.json(feedback);
+      }
+    );
+  } catch (error) {
+    console.error('Server error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Unread feedback endpoint
+
+router.get('/unread', authMiddleware, async (req, res) => {
+  try {
+    db.all(
+      `SELECT feedback.*, users.username 
+       FROM feedback 
+       LEFT JOIN users ON feedback.user_id = users.id
+       WHERE feedback.status = 'pending'
        ORDER BY created_at DESC`,
       [],
       (err, feedback) => {
