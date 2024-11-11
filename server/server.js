@@ -34,7 +34,7 @@ app.use(cors());
 app.use(express.json());
 
 // Static file serving - updated path
-app.use('/uploads', express.static(uploadDir));
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // Routes
 app.use('/api/auth', authRoutes);

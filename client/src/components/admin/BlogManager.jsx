@@ -14,8 +14,12 @@ function BlogManager() {
   const [formData, setFormData] = useState({
     title: '',
     content: '',
-    image_url: ''
-  })
+    image: null
+  });
+
+const [imagePreview, setImagePreview] = useState(null);
+
+
 
   // useEffect:
 
@@ -84,11 +88,47 @@ const loadPosts = async () => {
     }));
   };
 
+  const handleImageChange = (e) => {
+  const file = e.target.files[0];
+  if (file) {
+    if (file.size > 5 * 1024 * 1024) { // 5MB limit
+      setError('Image size must be less than 5MB');
+      e.target.value = null;
+      return;
+    }
+    
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setImagePreview(reader.result);
+    };
+    reader.readAsDataURL(file);
+    
+    setFormData(prev => ({
+      ...prev,
+      image: file
+    }));
+  }
+};
+
   const handleCreatePost = async (e) => {
     e.preventDefault();
-    try {
-      const response = await api.post('/api/blog/posts', formData);
+     try {
+      const formDataToSend = new FormData();
+      formDataToSend.append('title', formData.title);
+      formDataToSend.append('content', formData.content);
+      if (formData.image) {
+        formDataToSend.append('image', formData.image);
+      }
+
       
+    console.log('Form data being sent:');
+    console.log('Title:', formData.title);
+    console.log('Content:', formData.content);
+    console.log('Image:', formData.image);
+
+
+      const response = await api.post('/api/blog/posts', formDataToSend);
+    
       if (!response.ok) {
         const data = await response.json();
         throw new Error(data.message || 'Failed to create post');
@@ -96,21 +136,21 @@ const loadPosts = async () => {
 
       const data = await response.json();
       setPosts(prev => [...prev, data]);
-      setFormData({ title: '', content: '', image_url: '' });
+      setFormData({ title: '', content: '', image: null });
+      setImagePreview(null);
       setError(null);
       setSuccessMessage('Blog post created successfully!');
       setTimeout(() => setSuccessMessage(null), 3000);
     } catch (err) {
       console.error('Create post error:', err);
       setError(`Error creating post: ${err.message}`);
-      
+    
       if (err.message.includes('session') || err.message.includes('token')) {
         logout();
         navigate('/login');
       }
     }
   };
-
   const handleUpdatePost = async (e) => {
     e.preventDefault();
     try {
@@ -226,21 +266,44 @@ const loadPosts = async () => {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Image URL
+              Image
             </label>
-            <input
-              type="url"
-              name="image_url"
-              value={editingPost ? editingPost.image_url : formData.image_url}
-              onChange={editingPost ? 
-                (e) => setEditingPost({...editingPost, image_url: e.target.value}) : 
-                handleInputChange
-              }
-              className="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 
-                       dark:text-white focus:outline-none focus:ring-1 focus:ring-blue-500"
-              placeholder="https://example.com/image.jpg"
-            />
-          </div>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                className="block w-full text-sm text-gray-500 dark:text-gray-400
+                  file:mr-4 file:py-2 file:px-4
+                  file:rounded-md file:border-0
+                  file:text-sm file:font-semibold
+                  file:bg-blue-50 file:text-blue-700
+                  dark:file:bg-blue-900/50 dark:file:text-blue-200
+                  hover:file:bg-blue-100 dark:hover:file:bg-blue-900"
+              />
+              {imagePreview && (
+                <div className="mt-2">
+                  <img
+                    src={imagePreview}
+                    alt="Preview"
+                    className="h-32 w-auto object-cover rounded-md"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFormData(prev => ({ ...prev, image: null }));
+                      setImagePreview(null);
+                    }}
+                    className="mt-1 text-sm text-red-600 dark:text-red-400 hover:text-red-800 
+                            dark:hover:text-red-300"
+                  >
+                    Remove image
+                  </button>
+            </div>
+            )}
+             <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                Maximum file size: 5MB. Supported formats: JPG, PNG, GIF
+              </p>
+            </div>
 
           <div className="flex justify-end space-x-2">
             {editingPost && (
@@ -282,9 +345,11 @@ const loadPosts = async () => {
                 </h3>
                 {post.image_url && (
                   <img 
-                    src={post.image_url} 
+                    src={`http://localhost:5000${post.image_url}`}
                     alt={post.title}
-                    className="w-full max-h-48 object-cover rounded mb-4"
+                    className="w-full max-h-48 object-cover rounded mb-4 hover:opacity-90 
+                              transition-opacity cursor-pointer"
+                    onClick={() => window.open(`http://localhost:5000${post.image_url}`, '_blank')}
                   />
                 )}
                 <p className="text-gray-600 dark:text-gray-400 mb-4">{post.content}</p>

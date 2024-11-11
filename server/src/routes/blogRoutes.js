@@ -1,11 +1,54 @@
-
 // server/src/routes/blogRoutes.js
 import express from 'express';
+import multer from 'multer';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
 import db from '../config/database.js';
+import * as fs from 'fs';
 import authMiddleware from '../middleware/sessionMiddleware.js';
 import adminMiddleware from '../middleware/adminMiddleware.js';
 
 const router = express.Router();
+
+// Get absolute path for uploads directory
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const uploadPath = path.join(__dirname, '../../../uploads');
+
+// Ensure uploads directory exists
+if (!fs.existsSync(uploadPath)) {
+    fs.mkdirSync(uploadPath, { recursive: true });
+    console.log('Created uploads directory at:', uploadPath);
+}
+
+// Configure multer for file uploads
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, uploadPath)  // Using absolute path to uploads directory
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, 'blog-' + uniqueSuffix + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({ 
+  storage: storage,
+  limits: {
+    fileSize: 5 * 1024 * 1024 // 5MB limit
+  },
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = /jpeg|jpg|png|gif/;
+    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = allowedTypes.test(file.mimetype);
+
+    if (extname && mimetype) {
+      return cb(null, true);
+    }
+    cb(new Error('Only image files are allowed!'));
+  }
+});
 
 // Get all blog posts
 router.get('/posts', async (req, res) => {
@@ -52,9 +95,14 @@ router.get('/posts/:id', async (req, res) => {
   }
 });
 
-// Create new blog post (admin only)
-router.post('/posts', authMiddleware, adminMiddleware, async (req, res) => {
-  const { title, content, image_url } = req.body;
+// Update POST route 
+
+router.post('/posts', authMiddleware, adminMiddleware, upload.single('image'), async (req, res) => {
+  console.log('Received request:');
+  console.log('Body:', req.body);
+  console.log('File:', req.file);
+
+  const { title, content } = req.body;
   
   // Validation
   if (!title || !content) {
@@ -62,8 +110,8 @@ router.post('/posts', authMiddleware, adminMiddleware, async (req, res) => {
   }
 
   try {
-    console.log('Creating blog post:', { title, content, image_url });
     const now = new Date().toISOString();
+    const image_url = req.file ? `/uploads/${req.file.filename}` : null;
     
     db.run(
       `INSERT INTO blog_posts (
@@ -98,8 +146,8 @@ router.post('/posts', authMiddleware, adminMiddleware, async (req, res) => {
 });
 
 // Update blog post (admin only)
-router.put('/posts/:id', authMiddleware, adminMiddleware, async (req, res) => {
-  const { title, content, image_url } = req.body;
+router.put('/posts/:id', authMiddleware, adminMiddleware, upload.single('image'), async (req, res) => {
+  const { title, content } = req.body;
   const { id } = req.params;
 
   // Validation
@@ -109,6 +157,21 @@ router.put('/posts/:id', authMiddleware, adminMiddleware, async (req, res) => {
 
   try {
     const now = new Date().toISOString();
+    
+    // If there's a new image, use its path, otherwise keep existing image_url
+    let image_url;
+    if (req.file) {
+      image_url = `/uploads/blog/${req.file.filename}`;
+    } else {
+      // Get existing image_url from database
+      const post = await new Promise((resolve, reject) => {
+        db.get('SELECT image_url FROM blog_posts WHERE id = ?', [id], (err, row) => {
+          if (err) reject(err);
+          else resolve(row);
+        });
+      });
+      image_url = post ? post.image_url : null;
+    }
     
     db.run(
       `UPDATE blog_posts 
@@ -140,7 +203,6 @@ router.put('/posts/:id', authMiddleware, adminMiddleware, async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 });
-
 // Delete blog post (admin only)
 router.delete('/posts/:id', authMiddleware, adminMiddleware, async (req, res) => {
   const { id } = req.params;
