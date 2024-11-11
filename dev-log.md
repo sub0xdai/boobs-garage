@@ -121,10 +121,10 @@
    - [x] Test feedback notifications
 
 2. Blog System
-   - [ ] Complete blog post creation with images
-   - [ ] Test blog post editing
-   - [ ] Verify blog deletion
-   - [ ] Add blog listing page
+   - [x] Complete blog post creation with images
+   - [x] Test blog post editing
+   - [x] Verify blog deletion
+   - [x] Add blog listing page
 
 3. Services Page
    - [ ] Complete price updates functionality
@@ -144,8 +144,8 @@
 
 ## UI/UX
 1. Dark Mode
-   - [ ] Test all components in dark mode
-   - [ ] Fix any remaining dark mode issues
+   - [x] Test all components in dark mode
+   - [x] Fix any remaining dark mode issues
 
 2. Responsive Design
    - [ ] Test on mobile devices
@@ -182,3 +182,21 @@ _Blog Posts_
 - Blog functionality is just placeholders for now, need to add dynamic functionality
 - Will need to do similar for services
 - After this is just testing and cleanup
+
+## Todo 
+### Services
+Primary: "Bob wants to be able to change the prices on the site without contacting the webmaster"
+- Need to implement price update functionality first
+- Service images are secondary but similar to blog implementation
+- Categories can be added if time permits
+
+### Authentication & Security
+Most Critical:
+- Verify protected routes (required by brief)
+- Test role-based access (admin vs user permissions)
+- Token refresh mechanism (already partially implemented in fetchWithAuth.js)
+
+Less Critical:
+- Password reset (not mentioned in brief)
+- User profile updates (not specifically required)
+- Admin user management (basic admin exists)

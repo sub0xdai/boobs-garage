@@ -12,18 +12,21 @@ router.get('/', async (req, res) => {
   try {
     db.all('SELECT * FROM services', [], (err, services) => {
       if (err) {
+        console.error('Database error:', err);
         return res.status(500).json({ message: 'Server error' });
       }
+      console.log('Services from DB:', services); // Add this
       res.json(services);
     });
   } catch (error) {
+    console.error('Server error:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
 
 // Add new service (admin only)
 router.post('/', authMiddleware, adminMiddleware, async (req, res) => {
-  const { name, description, price } = req.body;
+  const { name, description, price, features } = req.body;  // Add features here
   
   // Add validation
   if (!name || !description || !price) {
@@ -31,14 +34,12 @@ router.post('/', authMiddleware, adminMiddleware, async (req, res) => {
       message: 'Name, description, and price are required' 
     });
   }
-
   try {
     // Log the incoming request
-    console.log('Creating service:', { name, description, price });
-
+    console.log('Creating service:', { name, description, price, features });
     db.run(
-      'INSERT INTO services (name, description, price, updated_at) VALUES (?, ?, ?, ?)',
-      [name, description, price, new Date().toISOString()],
+      'INSERT INTO services (name, description, price, features, updated_at) VALUES (?, ?, ?, ?, ?)',  // Add features column
+      [name, description, price, features, new Date().toISOString()],  // Add features parameter
       function(err) {
         if (err) {
           console.error('Database error:', err);
@@ -51,6 +52,7 @@ router.post('/', authMiddleware, adminMiddleware, async (req, res) => {
           name,
           description,
           price,
+          features,  // Add features here
           updated_at: new Date().toISOString()
         };
         
@@ -76,7 +78,7 @@ router.put('/:id', authMiddleware, adminMiddleware, async (req, res) => {
         if (err) {
           return res.status(500).json({ message: 'Error updating service' });
         }
-        res.json({ id, name, description, price });
+        res.json({ id, name, description, price, features });
       }
     );
   } catch (error) {

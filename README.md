@@ -29,44 +29,32 @@ bobs-garage/
 │   ├── src/
 │   │   ├── components/    # Reusable components
 │   │   │   ├── admin/    # Admin-specific components
++  │   │   │   └── BlogManager.jsx    # Blog post management
 │   │   │   ├── Layout.jsx
 │   │   │   ├── Navbar.jsx
 │   │   │   ├── Footer.jsx
 │   │   │   ├── ProtectedRoute.jsx
 │   │   │   └── AdminRoute.jsx
-│   │   ├── context/      # React Context providers
-│   │   │   ├── AuthContext.jsx
-│   │   │   └── ThemeContext.jsx
-│   │   ├── hooks/        # Custom React hooks
-│   │   │   └── useAuth.js
 │   │   ├── pages/        # Page components
 │   │   │   ├── Home.jsx
 │   │   │   ├── Services.jsx
 │   │   │   ├── Blog.jsx
++   │   │   │   └── BlogPost.jsx    # Individual post view
 │   │   │   ├── Contact.jsx
 │   │   │   ├── Login.jsx
 │   │   │   ├── Register.jsx
 │   │   │   └── AdminDashboard.jsx
-│   │   ├── App.jsx
-│   │   ├── main.jsx
-│   │   └── index.css
-│   ├── tailwind.config.js
-│   └── vite.config.js
-│
 └── server/                # Backend Express application
     ├── src/
-    │   ├── config/       # Configuration files
-    │   │   └── database.js
-    │   ├── controllers/  # Route controllers
-    │   │   └── authController.js
-    │   ├── middleware/   # Express middleware
-    │   │   ├── sessionMiddleware.js
-    │   │   └── adminMiddleware.js
     │   ├── routes/       # API routes
     │   │   ├── authRoutes.js
-    │   │   └── serviceRoutes.js
-    │   └── db/          # SQLite database file
-    ├── .env             # Environment variables
+    │   │   ├── serviceRoutes.js
++   │   │   └── blogRoutes.js    # Blog CRUD operations
+    │   ├── middleware/   # Express middleware
+    │   │   ├── sessionMiddleware.js
+    │   │   ├── adminMiddleware.js
++   │   │   └── multerConfig.js    # File upload handling
++   ├── uploads/         # Media storage directory
     └── server.js        # Main server file
 ```
 
@@ -97,6 +85,21 @@ routes: {
   public: ["/", "/services", "/blog", "/contact"],
   auth: ["/profile", "/feedback"],
   admin: ["/admin/*"]
+}
+```
+
+5. Backend:
+```javascript
+backend: {
+  runtime: "Node.js",
+  framework: "Express",
+  database: "SQLite",
+  auth: "JWT",
+  security: {
+    password: "bcryptjs",
+    middleware: "express-validator"
+  },
++ fileUploads: "multer"
 }
 ```
 

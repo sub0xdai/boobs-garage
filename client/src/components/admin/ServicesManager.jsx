@@ -1,4 +1,3 @@
-// src/components/admin/ServicesManager.jsx
 import { useState, useEffect } from 'react'
 import { api } from '../../utils/fetchWithAuth.js'
 import { useNavigate } from 'react-router-dom'
@@ -15,8 +14,10 @@ function ServicesManager() {
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    price: ''
+    price: '',
+    features: []
   })
+  const [newFeature, setNewFeature] = useState('');
 
   useEffect(() => {
     let mounted = true;
@@ -60,81 +61,100 @@ function ServicesManager() {
   }, [user, navigate, logout]);
 
   const handleInputChange = (e) => {
-  const { name, value } = e.target;
-  
-  // Special handling for price field
-  if (name === 'price') {
-    // Only accept valid numbers and empty string
-    if (value === '' || !isNaN(value)) {
+    const { name, value } = e.target;
+    
+    // Special handling for price field
+    if (name === 'price') {
+      // Only accept valid numbers and empty string
+      if (value === '' || !isNaN(value)) {
+        setFormData(prev => ({
+          ...prev,
+          [name]: value
+        }));
+      }
+    } else {
       setFormData(prev => ({
         ...prev,
         [name]: value
       }));
     }
-  } else {
+  }
+
+  const handleAddFeature = (e) => {
+    e.preventDefault();
+    if (newFeature.trim()) {
+      setFormData(prev => ({
+        ...prev,
+        features: [...prev.features, newFeature.trim()]
+      }));
+      setNewFeature('');
+    }
+  };
+
+  const handleRemoveFeature = (index) => {
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      features: prev.features.filter((_, i) => i !== index)
     }));
-  }
-}
+  };
 
-const handleCreateService = async (e) => {
-  e.preventDefault();
-  
-  // Validate price before submission
-  const price = parseFloat(formData.price);
-  if (isNaN(price)) {
-    setError('Please enter a valid number for price');
-    return;
-  }
-
-  try {
-    const serviceData = {
-      name: formData.name,
-      description: formData.description,
-      price: price
-    };
-    console.log('Creating service with data:', serviceData);
-
-    const response = await api.post('/api/services', serviceData);
-    console.log('Service creation response:', response);
+  const handleCreateService = async (e) => {
+    e.preventDefault();
     
-    let data;
+    const price = parseFloat(formData.price);
+    if (isNaN(price)) {
+      setError('Please enter a valid number for price');
+      return;
+    }
+
     try {
-      data = await response.json();
-    } catch (parseError) {
-      console.error('Error parsing response:', parseError);
-      throw new Error('Failed to create service: Invalid server response');
-    }
+      const serviceData = {
+        name: formData.name,
+        description: formData.description,
+        price: price,
+        features: JSON.stringify(formData.features)
+      };
+      console.log('Creating service with data:', serviceData);
 
-    if (!response.ok) {
-      throw new Error(data.message || 'Failed to create service');
-    }
+      const response = await api.post('/api/services', serviceData);
+      console.log('Service creation response:', response);
+      
+      let data;
+      try {
+        data = await response.json();
+      } catch (parseError) {
+        console.error('Error parsing response:', parseError);
+        throw new Error('Failed to create service: Invalid server response');
+      }
 
-    setServices(prev => [...prev, data]);
-    setFormData({ name: '', description: '', price: '' });
-    setError(null);
-    setSuccessMessage('Service created successfully!');
-    setTimeout(() => setSuccessMessage(null), 3000);
-  } catch (error) {
-    console.error('Create service error:', error);
-    setError(`Error creating service: ${error.message}`);
-    
-    if (error.message.includes('session') || error.message.includes('token')) {
-      logout();
-      navigate('/login');
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to create service');
+      }
+
+      setServices(prev => [...prev, data]);
+      setFormData({ name: '', description: '', price: '', features: [] });
+      setError(null);
+      setSuccessMessage('Service created successfully!');
+      setTimeout(() => setSuccessMessage(null), 3000);
+    } catch (error) {
+      console.error('Create service error:', error);
+      setError(`Error creating service: ${error.message}`);
+      
+      if (error.message.includes('session') || error.message.includes('token')) {
+        logout();
+        navigate('/login');
+      }
     }
-  }
-};
-// Update
+  };
+
   const handleUpdateService = async (e) => {
     e.preventDefault()
     try {
       const response = await api.put(`/api/services/${editingService.id}`, {
         ...formData,
-        price: parseFloat(formData.price)
-      })
+        price: parseFloat(formData.price),
+        features: JSON.stringify(formData.features)
+      });
 
       if (!response.ok) {
         const data = await response.json();
@@ -150,7 +170,7 @@ const handleCreateService = async (e) => {
         service.id === editingService.id ? data : service
       ));
       setEditingService(null);
-      setFormData({ name: '', description: '', price: '' });
+      setFormData({ name: '', description: '', price: '', features: [] });
       setError(null);
       setSuccessMessage('Service updated successfully!');
       setTimeout(() => setSuccessMessage(null), 3000);
@@ -160,12 +180,11 @@ const handleCreateService = async (e) => {
     }
   }
 
-// Delete
   const handleDeleteService = async (serviceId) => {
-    if (!window.confirm('Are you sure you want to delete this service?')) return
+    if (!window.confirm('Are you sure you want to delete this service?')) return;
 
     try {
-      const response = await api.delete(`/api/services/${serviceId}`)
+      const response = await api.delete(`/api/services/${serviceId}`);
       
       if (!response.ok) {
         const data = await response.json();
@@ -187,12 +206,13 @@ const handleCreateService = async (e) => {
   }
 
   const startEditing = (service) => {
-    setEditingService(service)
+    setEditingService(service);
     setFormData({
       name: service.name,
       description: service.description,
-      price: service.price.toString()
-    })
+      price: service.price.toString(),
+      features: service.features ? JSON.parse(service.features) : []
+    });
   }
 
   if (loading) {
@@ -274,13 +294,63 @@ const handleCreateService = async (e) => {
             />
           </div>
 
+          {/* Features Section */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Service Features
+            </label>
+            <div className="space-y-2 mb-2">
+              {formData.features.map((feature, index) => (
+                <div key={index} className="flex items-center space-x-2 bg-gray-50 dark:bg-gray-700 p-2 rounded">
+                  <span className="flex-1 text-gray-700 dark:text-gray-300">{feature}</span>
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveFeature(index)}
+                    className="text-red-600 hover:text-red-800 dark:text-red-400 p-1"
+                  >
+                    <svg 
+                      className="w-5 h-5" 
+                      fill="none" 
+                      stroke="currentColor" 
+                      viewBox="0 0 24 24"
+                    >
+                      <path 
+                        strokeLinecap="round" 
+                        strokeLinejoin="round" 
+                        strokeWidth={2} 
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" 
+                      />
+                    </svg>
+                  </button>
+                </div>
+              ))}
+            </div>
+            <div className="flex space-x-2">
+              <input
+                type="text"
+                value={newFeature}
+                onChange={(e) => setNewFeature(e.target.value)}
+                className="flex-1 px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 
+                         dark:text-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+                placeholder="Enter a new feature"
+              />
+              <button
+                type="button"
+                onClick={handleAddFeature}
+                className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition"
+              >
+                Add Feature
+              </button>
+            </div>
+          </div>
+
           <div className="flex justify-end space-x-2">
             {editingService && (
               <button
                 type="button"
                 onClick={() => {
-                  setEditingService(null)
-                  setFormData({ name: '', description: '', price: '' })
+                  setEditingService(null);
+                  setFormData({ name: '', description: '', price: '', features: [] });
                 }}
                 className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition"
               >
@@ -317,6 +387,17 @@ const handleCreateService = async (e) => {
                     <p className="text-blue-600 dark:text-blue-400 font-medium">
                       ${typeof service.price === 'number' ? service.price.toFixed(2) : service.price}
                     </p>
+                    {/* Display features */}
+                    {service.features && JSON.parse(service.features).length > 0 && (
+                      <div className="mt-2">
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Features:</p>
+                        <ul className="list-disc list-inside text-sm text-gray-600 dark:text-gray-400 pl-2">
+                          {JSON.parse(service.features).map((feature, idx) => (
+                            <li key={idx}>{feature}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                   </div>
                   <div className="flex space-x-2">
                     <button
@@ -341,7 +422,7 @@ const handleCreateService = async (e) => {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default ServicesManager
+export default ServicesManager;

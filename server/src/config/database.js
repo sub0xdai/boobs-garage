@@ -4,6 +4,8 @@ import bcrypt from 'bcryptjs';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
 
+
+
 // Get current file path
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -31,6 +33,9 @@ const db = new sqlite3.Database(dbPath, async (err) => {
 
   // Add the last_login column if it doesn't exist
   await addLastLoginColumn();
+
+  // Run the new migration for features column
+  await migrateDatabase();  // Add this line
 
   // Create admin user after tables are created
   try {
@@ -82,6 +87,33 @@ function addStatusColumn(db) {
         resolve();
       }
     });
+  });
+}
+
+function migrateDatabase() {
+  return new Promise((resolve, reject) => {
+    try {
+      // Check if column exists first
+      db.get("SELECT features FROM services LIMIT 1", [], (err) => {
+        if (err) {
+          // Column doesn't exist, add it
+          db.run("ALTER TABLE services ADD COLUMN features TEXT DEFAULT '[]'", [], (err) => {
+            if (err) {
+              console.error('Error adding features column:', err);
+              reject(err);
+            } else {
+              console.log('Successfully added features column to services table');
+              resolve();
+            }
+          });
+        } else {
+          resolve(); // Column already exists
+        }
+      });
+    } catch (error) {
+      console.error('Migration error:', error);
+      reject(error);
+    }
   });
 }
 
