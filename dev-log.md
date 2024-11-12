@@ -56,7 +56,7 @@
 - [x] Complete theme context implementation
 - [x] Complete remaining admin functionality
 - [x] Add loading states and error handling if appropriate
-- [ ] User customization feature
+
 - [x] Test
 
 # 11.07
@@ -112,68 +112,6 @@
 ## Issues 
 - Error likely caused by improper handling of asynchronous database connections or incorrect module imports/exports after refactoring to ES modules. DB not connecting after refactoring - resolved
 
-# Task List
-
-## Critical Features
-1. Feedback System
-   - [x] Test feedback creation with images
-   - [x] Verify admin feedback management (delete working)
-   - [x] Test feedback notifications
-
-2. Blog System
-   - [x] Complete blog post creation with images
-   - [x] Test blog post editing
-   - [x] Verify blog deletion
-   - [x] Add blog listing page
-
-3. Services Page
-   - [ ] Complete price updates functionality
-   - [ ] Add service categories (if required)
-   - [ ] Test service image uploads
-
-## Authentication & Security
-1. User Management
-   - [ ] Verify password reset flow
-   - [ ] Test user profile updates
-   - [ ] Complete admin user management
-
-2. Authorization
-   - [ ] Test role-based access
-   - [ ] Verify protected routes
-   - [ ] Test token refresh mechanism
-
-## UI/UX
-1. Dark Mode
-   - [x] Test all components in dark mode
-   - [x] Fix any remaining dark mode issues
-
-2. Responsive Design
-   - [ ] Test on mobile devices
-   - [ ] Test tablet layouts
-   - [ ] Fix any responsive issues
-
-## Testing
-1. Integration Tests
-   - [ ] Test all API endpoints
-   - [ ] Test file uploads
-   - [ ] Test auth flows
-
-2. Error Handling
-   - [ ] Add error boundaries
-   - [ ] Improve error messages
-   - [ ] Test network error scenarios
-
-## Final Steps
-1. Cleanup
-   - [ ] Remove console.logs
-   - [ ] Clean up comments
-   - [ ] Organize imports
-
-2. Documentation
-   - [ ] Update README
-   - [ ] Add API documentation
-   - [ ] Add setup instructions
-
 
 # 11.11
 _Blog Posts_
@@ -183,13 +121,22 @@ _Blog Posts_
 - Will need to do similar for services
 - After this is just testing and cleanup
 
+## Dev Log Updates:
+
+_Added features column to services database schema via migration
+Updated ServicesManager.jsx to include feature management (add/remove features)
+Modified serviceRoutes.js to handle features in POST and PUT routes
+Updated Services.jsx to display dynamic features from database
+Added proper JSON parsing for features in frontend display
+Fixed double service mapping in Services page
+Added debug logging to track data flow_
+
 ## Todo 
 ### Services
 Primary: "Bob wants to be able to change the prices on the site without contacting the webmaster"
 - Need to implement price update functionality first
 - Service images are secondary but similar to blog implementation
 - Categories can be added if time permits
-
 ### Authentication & Security
 Most Critical:
 - Verify protected routes (required by brief)
@@ -200,3 +147,11 @@ Less Critical:
 - Password reset (not mentioned in brief)
 - User profile updates (not specifically required)
 - Admin user management (basic admin exists)
+
+# 11.12
+- Added dynamic features support to services
+- Feature management for admins 
+- Fixed feature bug on public service page 
+- Added view toggle for service page 
+- Fixed issue with auth token for public routes 
+- Proper data flow from admin updates to public view 

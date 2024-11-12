@@ -5,6 +5,7 @@ import helmet from 'helmet';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
+
 dotenv.config();
 
 // ES module path fix
@@ -16,6 +17,7 @@ import serviceRoutes from './src/routes/serviceRoutes.js';
 import feedbackRoutes from './src/routes/feedbackRoutes.js';
 import authRoutes from './src/routes/authRoutes.js';
 import blogRoutes from './src/routes/blogRoutes.js';
+import userPreferencesRoutes from './src/routes/userPreferencesRoutes.js';
 
 // Create uploads directory if it doesn't exist
 import fs from 'fs';
@@ -41,6 +43,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/services', serviceRoutes);
 app.use('/api/blog', blogRoutes);
 app.use('/api/feedback', feedbackRoutes);
+app.use('/api/preferences', userPreferencesRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

@@ -1,10 +1,8 @@
 // src/pages/Home.jsx
-import TestAuth from '../components/TestAuth'
 
 function Home() {
   return (
     <div className="space-y-12">
-      <TestAuth />
       {/* Hero Section */}
       <section className="text-center pb-12">
         <h1 className="text-5xl font-bold mb-4 text-gray-900 dark:text-white">Welcome to Bob's Garage</h1>

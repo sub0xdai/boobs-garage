@@ -52,6 +52,7 @@ const upload = multer({
 
 // Get all blog posts
 router.get('/posts', async (req, res) => {
+  console.log('Blog posts request received');
   try {
     db.all(`
       SELECT blog_posts.*, users.username as author_name 
@@ -63,6 +64,7 @@ router.get('/posts', async (req, res) => {
         console.error('Database error:', err);
         return res.status(500).json({ message: 'Server error' });
       }
+      console.log('Sending posts:', posts.length);
       res.json(posts);
     });
   } catch (error) {

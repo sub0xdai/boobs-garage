@@ -93,23 +93,44 @@ function addStatusColumn(db) {
 function migrateDatabase() {
   return new Promise((resolve, reject) => {
     try {
-      // Check if column exists first
+      // First migration: features column in services table
       db.get("SELECT features FROM services LIMIT 1", [], (err) => {
         if (err) {
-          // Column doesn't exist, add it
           db.run("ALTER TABLE services ADD COLUMN features TEXT DEFAULT '[]'", [], (err) => {
             if (err) {
               console.error('Error adding features column:', err);
               reject(err);
             } else {
               console.log('Successfully added features column to services table');
-              resolve();
+              // After first migration succeeds, do the second one
+              migrateViewPreferences();
             }
           });
         } else {
-          resolve(); // Column already exists
+          // If first migration already done, check second one
+          migrateViewPreferences();
         }
       });
+
+      // Second migration: view_preferences column in users table
+      function migrateViewPreferences() {
+        db.get("SELECT view_preferences FROM users LIMIT 1", [], (err) => {
+          if (err) {
+            db.run("ALTER TABLE users ADD COLUMN view_preferences TEXT DEFAULT '{}'", [], (err) => {
+              if (err) {
+                console.error('Error adding view_preferences column:', err);
+                reject(err);
+              } else {
+                console.log('Successfully added view_preferences column to users table');
+                resolve();
+              }
+            });
+          } else {
+            resolve();
+          }
+        });
+      }
+
     } catch (error) {
       console.error('Migration error:', error);
       reject(error);
