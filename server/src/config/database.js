@@ -129,6 +129,8 @@ function migrateDatabase() {
             resolve();
           }
         });
+
+         
       }
 
     } catch (error) {
@@ -207,7 +209,15 @@ function initializeTables() {
       image_url TEXT,
       created_at TEXT NOT NULL,
       FOREIGN KEY (user_id) REFERENCES users(id)
-    )`];
+    )`,
+    `CREATE TABLE IF NOT EXISTS home_images (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      imageUrl TEXT NOT NULL,
+      active INTEGER DEFAULT 1,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    )`
+  ];
 
   tables.forEach(table => {
     db.run(table, err => {
@@ -217,6 +227,24 @@ function initializeTables() {
     });
   });
 }
+
+db.all("SELECT name FROM sqlite_master WHERE type='table'", [], (err, tables) => {
+  if (err) {
+    console.error('Error checking tables:', err);
+    return;
+  }
+  console.log('Available tables:', tables);
+  
+  // Check home_images table structure
+  db.all("PRAGMA table_info(home_images)", [], (err, columns) => {
+    if (err) {
+      console.error('Error checking home_images structure:', err);
+      return;
+    }
+    console.log('home_images table structure:', columns);
+  });
+});
+
 
 export default db;
 

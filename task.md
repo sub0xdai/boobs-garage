@@ -19,14 +19,14 @@
 
 ## Authentication & Security
 1. User Management
-   - [ ] Verify password reset flow
-   - [ ] Test user profile updates
-   - [ ] Complete admin user management
+   - [x] Verify password reset flow
+   - [x] Test user profile updates
+   - [x] Complete admin user management
 
 2. Authorization
-   - [ ] Test role-based access
-   - [ ] Verify protected routes
-   - [ ] Test token refresh mechanism
+   - [x] Test role-based access
+   - [x] Verify protected routes
+   - [x] Test token refresh mechanism
 
 ## UI/UX
 1. Dark Mode

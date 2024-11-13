@@ -4,7 +4,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import path from 'path';
 import { fileURLToPath } from 'url';
-
+import fs from 'fs';
 
 dotenv.config();
 
@@ -18,12 +18,12 @@ import feedbackRoutes from './src/routes/feedbackRoutes.js';
 import authRoutes from './src/routes/authRoutes.js';
 import blogRoutes from './src/routes/blogRoutes.js';
 import userPreferencesRoutes from './src/routes/userPreferencesRoutes.js';
+import homeImageRoutes from './src/routes/homeImageRoutes.js';
 
-// Create uploads directory if it doesn't exist
-import fs from 'fs';
-const uploadDir = path.join(__dirname, 'uploads');
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
+// Create uploads directory if it doesn't exist (single definition)
+const uploadsDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
 const app = express();
@@ -35,8 +35,14 @@ app.use(helmet({
 app.use(cors());
 app.use(express.json());
 
-// Static file serving - updated path
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+// Static file serving - fixed path
+app.use('/uploads', express.static(uploadsDir));
+
+// Debug logging
+app.use((req, res, next) => {
+  console.log('API Request:', req.method, req.path);
+  next();
+});
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -44,6 +50,7 @@ app.use('/api/services', serviceRoutes);
 app.use('/api/blog', blogRoutes);
 app.use('/api/feedback', feedbackRoutes);
 app.use('/api/preferences', userPreferencesRoutes);
+app.use('/api', homeImageRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -52,8 +59,7 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = process.env.PORT || 5000;
-
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+  console.log('Uploads directory:', uploadsDir); // Debug log
 });
-

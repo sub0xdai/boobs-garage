@@ -154,4 +154,24 @@ Less Critical:
 - Fixed feature bug on public service page 
 - Added view toggle for service page 
 - Fixed issue with auth token for public routes 
-- Proper data flow from admin updates to public view 
+- Proper data flow from admin updates to public view
+- Fixed issue with images not rendering in blog posts
+
+## Issues
+- Added bob ability to fix home page
+```bash
+Server routes for /api/home-image and /api/home-image/upload are missing, causing 404 errors on frontend requests.
+```
+- Need Staff (meet the team) page (4 staff, bob, 2 mechanics and an admin)
+- Need about us page
+- On home page the buttons need functionality (Book a Service, Call Now, Book Online)
+- Managing home page image doesnt render an image, cannot delete it
+
+# 11.13
+- Fixed issue with admin dashboard and home page (bobs requirement to add images to home page)
+
+## Issues
+- Persistant issue with admin button disappearing on page refresh
+    - Still need:
+        - Staff
+        - About Us

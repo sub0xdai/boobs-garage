@@ -13,115 +13,163 @@ export function useAuth() {
   return context
 }
 
-
 function AuthProvider({ children }) {
-  const [user, setUser] = useState(null)
+  // Initialize user state from localStorage
+  
+const [user, setUser] = useState(() => {
+  try {
+    const token = localStorage.getItem('token');
+    const refreshToken = localStorage.getItem('refreshToken');
+    const storedUser = localStorage.getItem('userData');
+    
+    if (token && refreshToken && storedUser) {
+      try {
+        const parsedUser = JSON.parse(storedUser);
+        return {
+          ...parsedUser,
+          token,
+          refreshToken
+        };
+      } catch (e) {
+        // Clear invalid data
+        localStorage.removeItem('userData');
+        localStorage.removeItem('token');
+        localStorage.removeItem('refreshToken');
+        return null;
+      }
+    }
+    return null;
+  } catch (e) {
+    console.error('Error initializing user state:', e);
+    return null;
+  }
+});
+
+  
   const [loading, setLoading] = useState(true)
   const navigate = useNavigate();
+
   
 const login = async (credentials) => {
   try {
-    setLoading(true)
+    setLoading(true);
     const response = await fetch('http://localhost:5000/api/auth/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(credentials)
-    })
+    });
     
-    const data = await response.json()
-    console.log('Raw login response:', data) // Debug log
+    const data = await response.json();
     
     if (response.ok) {
-      // Store both tokens
-      localStorage.setItem('token', data.token)
-      localStorage.setItem('refreshToken', data.refreshToken)
+      // Store tokens
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('refreshToken', data.refreshToken);
       
-      // Set user with all data
+      // Create and store user data
       const userData = {
-        ...data.user,
+        id: data.user.id,
+        email: data.user.email,
+        isAdmin: data.user.isAdmin,
+        // Add any other relevant user data
+      };
+      
+      localStorage.setItem('userData', JSON.stringify(userData));
+      
+      // Set user state with all necessary data
+      setUser({
+        ...userData,
         token: data.token,
         refreshToken: data.refreshToken
-      }
+      });
       
-      console.log('Setting user data:', userData) // Debug log
-      setUser(userData)
-      
-      // Return the full user data
-      return userData
+      return {
+        ...userData,
+        token: data.token,
+        refreshToken: data.refreshToken
+      };
     } else {
-      throw new Error(data.message || 'Login failed')
+      throw new Error(data.message || 'Login failed');
     }
   } catch (error) {
-    console.error('Login error details:', error)
-    throw error
+    console.error('Login error:', error);
+    throw error;
   } finally {
-    setLoading(false)
+    setLoading(false);
   }
-}
+};
+
 
   const refreshToken = async () => {
     try {
-      const refreshToken = localStorage.getItem('refreshToken')
-      if (!refreshToken) throw new Error('No refresh token')
+      const currentRefreshToken = localStorage.getItem('refreshToken')
+      if (!currentRefreshToken) throw new Error('No refresh token')
 
       const response = await fetch('http://localhost:5000/api/auth/refresh-token', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ refreshToken })
+        body: JSON.stringify({ refreshToken: currentRefreshToken })
       })
 
       if (!response.ok) throw new Error('Failed to refresh token')
 
       const data = await response.json()
       localStorage.setItem('token', data.token)
+      
+      // Update user state with new token
+      setUser(prev => prev ? { ...prev, token: data.token } : null)
+      
       return data.token
     } catch (error) {
       console.error('Token refresh error:', error)
-      logout()
+      await logout()
       throw error
     }
   }
 
-  const logout = async () => {
+  
+const logout = async () => {
   try {
-    // Clear state and storage immediately for better UX
-    setUser(null)
-    localStorage.removeItem('token')
-    localStorage.removeItem('refreshToken')
+    const refreshToken = localStorage.getItem('refreshToken');
+    
+    // Clear state and storage first
+    setUser(null);
+    localStorage.clear(); // Clear all storage
 
-    const refreshToken = localStorage.getItem('refreshToken')
     if (refreshToken) {
-      // Use api utility for consistency and error handling
-      await api.post('/api/auth/logout', { refreshToken })
-        .catch(err => {
-          // Log but don't throw - user is already logged out locally
-          console.error('Server logout failed:', err)
-        })
+      try {
+        await api.post('/api/auth/logout', { refreshToken });
+      } catch (err) {
+        // Just log the error, don't prevent logout
+        console.log('Server logout notification failed:', err);
+      }
     }
 
-    // Navigate after logout
-    navigate('/')
+    navigate('/');
   } catch (error) {
-    console.error('Logout error:', error)
-    // No need to handle error since user is already logged out locally
+    console.error('Logout error:', error);
+    // Ensure user is logged out locally even if server logout fails
+    setUser(null);
+    localStorage.clear();
+    navigate('/');
   }
-}
+};
 
-  // Add initial auth check
+
   useEffect(() => {
     const verifyAuth = async () => {
       try {
         const token = localStorage.getItem('token')
         const storedRefreshToken = localStorage.getItem('refreshToken')
+        const storedUser = localStorage.getItem('userData')
         
-        if (!token || !storedRefreshToken) {
+        if (!token || !storedRefreshToken || !storedUser) {
           setLoading(false)
           return
         }
 
-        // Try to get user profile
         const response = await fetch('http://localhost:5000/api/auth/profile', {
           headers: {
             'Authorization': `Bearer ${token}`
@@ -131,9 +179,9 @@ const login = async (credentials) => {
         if (response.ok) {
           const userData = await response.json()
           setUser({
+            ...userData,
             token,
-            refreshToken: storedRefreshToken,
-            ...userData
+            refreshToken: storedRefreshToken
           })
         } else {
           // Try to refresh token
@@ -148,21 +196,21 @@ const login = async (credentials) => {
             if (profileResponse.ok) {
               const userData = await profileResponse.json()
               setUser({
+                ...userData,
                 token: newToken,
-                refreshToken: storedRefreshToken,
-                ...userData
+                refreshToken: storedRefreshToken
               })
             } else {
               throw new Error('Profile fetch failed after token refresh')
             }
           } catch (error) {
             console.error('Auth refresh error:', error)
-            logout()
+            await logout()
           }
         }
       } catch (error) {
         console.error('Auth verification error:', error)
-        logout()
+        await logout()
       } finally {
         setLoading(false)
       }

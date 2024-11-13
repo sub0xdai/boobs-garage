@@ -6,7 +6,8 @@ const publicRoutes = [
   '/auth/register',
   '/api/feedback',
   '/api/services',
-  '/api/blog/posts'
+  '/api/blog/posts',
+  '/api/home-image'
 ]
 
 const refreshToken = async () => {

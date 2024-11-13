@@ -1,6 +1,30 @@
 // src/pages/Home.jsx
+import React, { useEffect, useState } from 'react';
+import fetchWithAuth from '../utils/fetchWithAuth';
 
 function Home() {
+  const [homeImage, setHomeImage] = useState(null);  // Move this to the top
+
+  useEffect(() => {
+    const fetchHomeImage = async () => {
+      try {
+        const response = await fetchWithAuth('/api/home-image');
+        console.log('Home image response:', response); // Debug log
+        if (response.ok) {
+          const data = await response.json();
+          console.log('Home image data:', data); // Debug log
+          if (data.imageUrl) {
+            setHomeImage(data);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching home image:', error);
+      }
+    };
+
+    fetchHomeImage();
+  }, []);
+
   return (
     <div className="space-y-12">
       {/* Hero Section */}
@@ -12,6 +36,19 @@ function Home() {
           Book a Service
         </button>
       </section>
+
+      {/* Featured Image */}
+      {homeImage?.imageUrl && (
+        <section className="relative">
+          <div className="overflow-hidden rounded-xl shadow-lg max-w-6xl mx-auto">
+            <img
+              src={`http://localhost:5000${homeImage.imageUrl}`}
+              alt="Bob's Garage Featured Image"
+              className="w-full h-[400px] object-cover object-center"
+            />
+          </div>
+        </section>
+      )}
 
       {/* Services Preview */}
       <section className="grid md:grid-cols-3 gap-8">

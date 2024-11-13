@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react';
 import { api } from '../utils/fetchWithAuth';
 import { useNavigate } from 'react-router-dom';
 
+const SERVER_URL = 'http://localhost:5000'
+
+
 function Blog() {
   const navigate = useNavigate();
   const [posts, setPosts] = useState([]);
@@ -13,6 +16,7 @@ function Blog() {
       try {
         const response = await api.get('/api/blog/posts');
         const data = await response.json();
+        console.log('Blog posts data (detailed):', JSON.stringify(data, null, 2));         
         setPosts(data);
         setError(null);
       } catch (err) {
@@ -50,10 +54,10 @@ function Blog() {
         <div className="mb-12 bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
           {featuredPost.image_url && (
             <img 
-              src={featuredPost.image_url} 
+              src={`${SERVER_URL}${featuredPost.image_url}`} 
               alt={featuredPost.title} 
               className="w-full h-64 object-cover cursor-pointer"
-              onClick={() => window.open(featuredPost.image_url, '_blank')}
+              onClick={() => window.open(`${SERVER_URL}${featuredPost.image_url}`, '_blank')}            
             />
           )}
           <div className="p-6">
@@ -85,10 +89,10 @@ function Blog() {
           <div key={post.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
             {post.image_url && (
               <img 
-                src={post.image_url} 
+                src={`${SERVER_URL}${post.image_url}`} 
                 alt={post.title} 
                 className="w-full h-48 object-cover cursor-pointer"
-                onClick={() => window.open(post.image_url, '_blank')}
+                onClick={() => window.open(`${SERVER_URL}${post.image_url}`, '_blank')}              
               />
             )}
             <div className="p-6">
