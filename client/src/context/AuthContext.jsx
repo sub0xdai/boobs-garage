@@ -5,167 +5,144 @@ import { useNavigate } from 'react-router-dom'
 
 const AuthContext = createContext(null)
 
-export function useAuth() {
-  const context = React.useContext(AuthContext)
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider')
+// Utility function to decode JWT payload
+const decodeToken = (token) => {
+  try {
+    const base64Url = token.split('.')[1]
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
+    const payload = JSON.parse(window.atob(base64))
+    console.log('Decoded token payload:', payload)
+    return payload
+  } catch (error) {
+    console.error('Token decode error:', error)
+    return null
   }
-  return context
+}
+
+// Utility to get admin status from token
+const getAdminFromToken = (token) => {
+  const payload = decodeToken(token)
+  const isAdmin = payload?.user?.isAdmin === true
+  console.log('Admin status from token:', isAdmin)
+  return isAdmin
 }
 
 function AuthProvider({ children }) {
-  // Initialize user state from localStorage
-  
-const [user, setUser] = useState(() => {
-  try {
-    const token = localStorage.getItem('token');
-    const refreshToken = localStorage.getItem('refreshToken');
-    const storedUser = localStorage.getItem('userData');
-    
-    if (token && refreshToken && storedUser) {
-      try {
-        const parsedUser = JSON.parse(storedUser);
-        return {
+  const [user, setUser] = useState(() => {
+    try {
+      const token = localStorage.getItem('token')
+      const refreshToken = localStorage.getItem('refreshToken')
+      const storedUser = localStorage.getItem('userData')
+
+      if (token && refreshToken && storedUser) {
+        const parsedUser = JSON.parse(storedUser)
+        const isAdmin = getAdminFromToken(token)
+        
+        const userData = {
           ...parsedUser,
           token,
-          refreshToken
-        };
-      } catch (e) {
-        // Clear invalid data
-        localStorage.removeItem('userData');
-        localStorage.removeItem('token');
-        localStorage.removeItem('refreshToken');
-        return null;
+          refreshToken,
+          isAdmin
+        }
+        
+        console.log('Initial user state:', userData)
+        return userData
       }
+      return null
+    } catch (error) {
+      console.error('User state initialization error:', error)
+      localStorage.clear()
+      return null
     }
-    return null;
-  } catch (e) {
-    console.error('Error initializing user state:', e);
-    return null;
-  }
-});
+  })
 
-  
   const [loading, setLoading] = useState(true)
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
-  
-const login = async (credentials) => {
-  try {
-    setLoading(true);
-    const response = await fetch('http://localhost:5000/api/auth/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(credentials)
-    });
+  // Update user data and storage
+  const updateUserState = (userData, token, refreshToken) => {
+    const isAdmin = getAdminFromToken(token)
     
-    const data = await response.json();
-    
-    if (response.ok) {
-      // Store tokens
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('refreshToken', data.refreshToken);
-      
-      // Create and store user data
-      const userData = {
-        id: data.user.id,
-        email: data.user.email,
-        isAdmin: data.user.isAdmin,
-        // Add any other relevant user data
-      };
-      
-      localStorage.setItem('userData', JSON.stringify(userData));
-      
-      // Set user state with all necessary data
-      setUser({
-        ...userData,
-        token: data.token,
-        refreshToken: data.refreshToken
-      });
-      
-      return {
-        ...userData,
-        token: data.token,
-        refreshToken: data.refreshToken
-      };
-    } else {
-      throw new Error(data.message || 'Login failed');
+    const fullUserData = {
+      ...userData,
+      token,
+      refreshToken,
+      isAdmin
     }
-  } catch (error) {
-    console.error('Login error:', error);
-    throw error;
-  } finally {
-    setLoading(false);
+    
+    console.log('Updating user state:', fullUserData)
+    
+    // Update storage
+    localStorage.setItem('token', token)
+    localStorage.setItem('refreshToken', refreshToken)
+    localStorage.setItem('userData', JSON.stringify({
+      ...userData,
+      isAdmin
+    }))
+    
+    setUser(fullUserData)
+    return fullUserData
   }
-};
 
+  const login = async (credentials) => {
+    try {
+      setLoading(true)
+      const response = await fetch('http://localhost:5000/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(credentials)
+      })
+      
+      const data = await response.json()
+      console.log('Login response:', data)
+      
+      if (response.ok) {
+        return updateUserState(data.user, data.token, data.refreshToken)
+      } else {
+        throw new Error(data.message || 'Login failed')
+      }
+    } catch (error) {
+      console.error('Login error:', error)
+      throw error
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const refreshToken = async () => {
-    try {
-      const currentRefreshToken = localStorage.getItem('refreshToken')
-      if (!currentRefreshToken) throw new Error('No refresh token')
-
-      const response = await fetch('http://localhost:5000/api/auth/refresh-token', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ refreshToken: currentRefreshToken })
-      })
-
-      if (!response.ok) throw new Error('Failed to refresh token')
-
-      const data = await response.json()
-      localStorage.setItem('token', data.token)
-      
-      // Update user state with new token
-      setUser(prev => prev ? { ...prev, token: data.token } : null)
-      
-      return data.token
-    } catch (error) {
-      console.error('Token refresh error:', error)
-      await logout()
-      throw error
+    const currentRefreshToken = localStorage.getItem('refreshToken')
+    if (!currentRefreshToken) {
+      throw new Error('No refresh token')
     }
-  }
 
-  
-const logout = async () => {
-  try {
-    const refreshToken = localStorage.getItem('refreshToken');
+    const response = await fetch('http://localhost:5000/api/auth/refresh-token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refreshToken: currentRefreshToken })
+    })
+
+    if (!response.ok) {
+      throw new Error('Failed to refresh token')
+    }
+
+    const data = await response.json()
+    console.log('Token refresh response:', data)
     
-    // Clear state and storage first
-    setUser(null);
-    localStorage.clear(); // Clear all storage
-
-    if (refreshToken) {
-      try {
-        await api.post('/api/auth/logout', { refreshToken });
-      } catch (err) {
-        // Just log the error, don't prevent logout
-        console.log('Server logout notification failed:', err);
-      }
+    if (user) {
+      updateUserState(user, data.token, currentRefreshToken)
     }
-
-    navigate('/');
-  } catch (error) {
-    console.error('Logout error:', error);
-    // Ensure user is logged out locally even if server logout fails
-    setUser(null);
-    localStorage.clear();
-    navigate('/');
+    
+    return data.token
   }
-};
 
-
+  // Effect for initial auth check
   useEffect(() => {
     const verifyAuth = async () => {
       try {
         const token = localStorage.getItem('token')
-        const storedRefreshToken = localStorage.getItem('refreshToken')
-        const storedUser = localStorage.getItem('userData')
-        
-        if (!token || !storedRefreshToken || !storedUser) {
+        if (!token) {
           setLoading(false)
           return
         }
@@ -177,14 +154,14 @@ const logout = async () => {
         })
 
         if (response.ok) {
-          const userData = await response.json()
-          setUser({
-            ...userData,
-            token,
-            refreshToken: storedRefreshToken
-          })
+          const profileData = await response.json()
+          console.log('Profile verification:', profileData)
+          
+          if (user) {
+            updateUserState(profileData, token, user.refreshToken)
+          }
         } else {
-          // Try to refresh token
+          // Try refresh token
           try {
             const newToken = await refreshToken()
             const profileResponse = await fetch('http://localhost:5000/api/auth/profile', {
@@ -194,17 +171,13 @@ const logout = async () => {
             })
 
             if (profileResponse.ok) {
-              const userData = await profileResponse.json()
-              setUser({
-                ...userData,
-                token: newToken,
-                refreshToken: storedRefreshToken
-              })
-            } else {
-              throw new Error('Profile fetch failed after token refresh')
+              const profileData = await profileResponse.json()
+              if (user) {
+                updateUserState(profileData, newToken, user.refreshToken)
+              }
             }
           } catch (error) {
-            console.error('Auth refresh error:', error)
+            console.error('Profile refresh error:', error)
             await logout()
           }
         }
@@ -217,14 +190,37 @@ const logout = async () => {
     }
 
     verifyAuth()
-  }, []) // Empty dependency array means this runs once on mount
+  }, [])
 
+  const logout = async () => {
+    try {
+      const refreshToken = localStorage.getItem('refreshToken')
+      
+      setUser(null)
+      localStorage.clear()
+
+      if (refreshToken) {
+        try {
+          await api.post('/api/auth/logout', { refreshToken })
+        } catch (err) {
+          console.warn('Server logout notification failed:', err)
+        }
+      }
+    } catch (error) {
+      console.error('Logout error:', error)
+    } finally {
+      navigate('/')
+    }
+  }
+
+  // Consistent object reference for value
   const value = {
     user,
     loading,
     login,
     logout,
-    refreshToken
+    refreshToken,
+    isAdmin: user?.isAdmin === true
   }
 
   return (

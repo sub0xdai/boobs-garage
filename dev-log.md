@@ -172,6 +172,18 @@ Server routes for /api/home-image and /api/home-image/upload are missing, causin
 
 ## Issues
 - Persistant issue with admin button disappearing on page refresh
+```bash
+Source map errors are cluttering the console, but main functionalities remain unaffected. The "admin" user persists with isAdmin as false, despite an isAdmin: true token payload. Check if the admin role setting in the backend is accurately synced with the frontend state during session initialization.
+```
     - Still need:
         - Staff
         - About Us
+>[!example] FIXED 
+- Centralized admin status management
+- Added JWT payload decoding utility
+- Implemented strict boolean checks for isAdmin
+- Added consistent storage/state sync
+- Fixed token verification workflow
+- Added strategic debug logging
+
+
