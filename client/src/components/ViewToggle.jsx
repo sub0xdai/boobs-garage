@@ -1,14 +1,13 @@
-// src/components/ViewToggle.jsx
 function ViewToggle({ viewMode, setViewMode }) {
   return (
     <div className="flex items-center gap-2">
       <button
         onClick={() => setViewMode('grid')}
-        className={`p-2 rounded-md transition-colors ${
+        className={`p-2 rounded-md transition-all duration-200 ${
           viewMode === 'grid'
-            ? 'bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-400'
-            : 'hover:bg-gray-100 dark:hover:bg-gray-800'
-        }`}
+            ? 'bg-[#8fbcbb] text-[#2e3440] dark:bg-[#88c0d0] dark:text-[#2e3440]'
+            : 'text-[#4c566a] dark:text-[#81a1c1] hover:bg-[#d8dee9] dark:hover:bg-[#434c5e] hover:text-[#8fbcbb] dark:hover:text-[#88c0d0]'
+        } hover:shadow-md active:scale-95`}
         title="Grid View"
       >
         <svg 
@@ -27,11 +26,11 @@ function ViewToggle({ viewMode, setViewMode }) {
       </button>
       <button
         onClick={() => setViewMode('list')}
-        className={`p-2 rounded-md transition-colors ${
+        className={`p-2 rounded-md transition-all duration-200 ${
           viewMode === 'list'
-            ? 'bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-400'
-            : 'hover:bg-gray-100 dark:hover:bg-gray-800'
-        }`}
+            ? 'bg-[#8fbcbb] text-[#2e3440] dark:bg-[#88c0d0] dark:text-[#2e3440]'
+            : 'text-[#4c566a] dark:text-[#81a1c1] hover:bg-[#d8dee9] dark:hover:bg-[#434c5e] hover:text-[#8fbcbb] dark:hover:text-[#88c0d0]'
+        } hover:shadow-md active:scale-95`}
         title="List View"
       >
         <svg 

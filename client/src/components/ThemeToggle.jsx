@@ -1,20 +1,20 @@
-// src/components/ThemeToggle.jsx
 import { useTheme } from '../context/ThemeContext';
 
 export const ThemeToggle = () => {
   const { theme, toggleTheme } = useTheme();
-
+  
   return (
     <button
       onClick={toggleTheme}
-      className="p-2 rounded-lg transition-colors duration-200 
-                hover:bg-gray-100 dark:hover:bg-gray-800
-                focus:outline-none focus:ring-2 focus:ring-gray-200 dark:focus:ring-gray-700"
+      className="p-2 rounded-lg transition-all duration-200 
+                hover:bg-[#d8dee9] dark:hover:bg-[#434c5e]
+                focus:outline-none focus:ring-2 focus:ring-[#8fbcbb] dark:focus:ring-[#88c0d0]
+                hover:shadow-md active:scale-95"
       aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
     >
       {theme === 'light' ? (
         <svg 
-          className="h-5 w-5 text-gray-700" 
+          className="h-5 w-5 text-[#2e3440] hover:text-[#5e81ac] transition-colors duration-200" 
           fill="none" 
           viewBox="0 0 24 24" 
           stroke="currentColor"
@@ -28,7 +28,7 @@ export const ThemeToggle = () => {
         </svg>
       ) : (
         <svg 
-          className="h-5 w-5 text-gray-200" 
+          className="h-5 w-5 text-[#d8dee9] hover:text-[#88c0d0] transition-colors duration-200" 
           fill="none" 
           viewBox="0 0 24 24" 
           stroke="currentColor"
@@ -46,4 +46,3 @@ export const ThemeToggle = () => {
 };
 
 export default ThemeToggle;
-

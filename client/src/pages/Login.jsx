@@ -1,5 +1,3 @@
-
-// src/pages/Login.jsx
 import { useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
@@ -17,7 +15,6 @@ function Login() {
       const response = await login(data)
       console.log('Full login response:', response)
 
-      // Check user.isAdmin instead of just isAdmin
       if (response?.user?.isAdmin) {
         console.log('Admin user detected, navigating to admin dashboard')
         navigate('/admin')
@@ -33,19 +30,19 @@ function Login() {
 
   return (
     <div className="max-w-md mx-auto">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8">
-        <h1 className="text-3xl font-bold mb-6 text-gray-900 dark:text-white">Login</h1>
+      <div className="bg-[#e5e9f0] dark:bg-[#3b4252] rounded-lg shadow-md p-8 transition-colors duration-200">
+        <h1 className="text-3xl font-bold mb-6 text-[#2e3440] dark:text-[#d8dee9]">Login</h1>
         
         {loginError && (
-          <div className="bg-red-100 dark:bg-red-900 border border-red-400 dark:border-red-700 
-                         text-red-700 dark:text-red-200 px-4 py-3 rounded mb-4">
+          <div className="bg-[#bf616a]/20 dark:bg-[#bf616a]/10 border border-[#bf616a] 
+                       text-[#bf616a] dark:text-[#bf616a] px-4 py-3 rounded mb-4 transition-colors duration-200">
             {loginError}
           </div>
         )}
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-sm font-medium text-[#4c566a] dark:text-[#81a1c1] mb-1">
               Email
             </label>
             <input
@@ -57,18 +54,20 @@ function Login() {
                 }
               })}
               type="email"
-              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 
-                          bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white 
-                          ${errors.email ? 'border-red-500 dark:border-red-500' : ''}`}
+              className={`w-full px-3 py-2 border rounded-md transition-all duration-200
+                       focus:outline-none focus:ring-1 focus:ring-[#8fbcbb] dark:focus:ring-[#88c0d0]
+                       bg-white dark:bg-[#2e3440] border-[#d8dee9] dark:border-[#4c566a] 
+                       text-[#2e3440] dark:text-[#d8dee9] placeholder-[#4c566a] dark:placeholder-[#81a1c1]
+                       ${errors.email ? 'border-[#bf616a] dark:border-[#bf616a]' : ''}`}
               placeholder="your@email.com"
             />
             {errors.email && (
-              <p className="mt-1 text-sm text-red-500 dark:text-red-400">{errors.email.message}</p>
+              <p className="mt-1 text-sm text-[#bf616a] dark:text-[#bf616a]">{errors.email.message}</p>
             )}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-sm font-medium text-[#4c566a] dark:text-[#81a1c1] mb-1">
               Password
             </label>
             <input
@@ -80,13 +79,15 @@ function Login() {
                 }
               })}
               type="password"
-              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 
-                          bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white 
-                          ${errors.password ? 'border-red-500 dark:border-red-500' : ''}`}
+              className={`w-full px-3 py-2 border rounded-md transition-all duration-200
+                       focus:outline-none focus:ring-1 focus:ring-[#8fbcbb] dark:focus:ring-[#88c0d0]
+                       bg-white dark:bg-[#2e3440] border-[#d8dee9] dark:border-[#4c566a] 
+                       text-[#2e3440] dark:text-[#d8dee9] placeholder-[#4c566a] dark:placeholder-[#81a1c1]
+                       ${errors.password ? 'border-[#bf616a] dark:border-[#bf616a]' : ''}`}
               placeholder="••••••••"
             />
             {errors.password && (
-              <p className="mt-1 text-sm text-red-500 dark:text-red-400">{errors.password.message}</p>
+              <p className="mt-1 text-sm text-[#bf616a] dark:text-[#bf616a]">{errors.password.message}</p>
             )}
           </div>
 
@@ -94,29 +95,30 @@ function Login() {
             <div className="flex items-center">
               <input
                 type="checkbox"
-                className="h-4 w-4 text-blue-600 dark:text-blue-500 border-gray-300 dark:border-gray-600 rounded
-                           focus:ring-blue-500 dark:focus:ring-blue-400 bg-white dark:bg-gray-700"
+                className="h-4 w-4 text-[#8fbcbb] dark:text-[#88c0d0] border-[#d8dee9] dark:border-[#4c566a] rounded
+                         focus:ring-[#8fbcbb] dark:focus:ring-[#88c0d0] bg-white dark:bg-[#2e3440] transition-colors duration-200"
               />
-              <label className="ml-2 text-sm text-gray-600 dark:text-gray-400">Remember me</label>
+              <label className="ml-2 text-sm text-[#4c566a] dark:text-[#81a1c1]">Remember me</label>
             </div>
-            <a href="#" className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300">
+            <a href="#" className="text-sm text-[#8fbcbb] dark:text-[#88c0d0] hover:text-[#5e81ac] dark:hover:text-[#5e81ac] transition-colors duration-200">
               Forgot password?
             </a>
           </div>
 
           <button
             type="submit"
-            className="w-full bg-blue-600 dark:bg-blue-500 text-white py-2 px-4 rounded-md 
-                       hover:bg-blue-700 dark:hover:bg-blue-600 transition"
+            className="w-full bg-[#d08770] dark:bg-[#bf616a] text-white py-2 px-4 rounded-md 
+                     hover:bg-[#c97a65] dark:hover:bg-[#a9545d] transition-all duration-200
+                     shadow-md hover:shadow-lg active:scale-98"
           >
             Sign In
           </button>
         </form>
 
         <div className="mt-6 text-center">
-          <p className="text-sm text-gray-600 dark:text-gray-400">
+          <p className="text-sm text-[#4c566a] dark:text-[#81a1c1]">
             Don't have an account?{' '}
-            <a href="/register" className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300">
+            <a href="/register" className="text-[#8fbcbb] dark:text-[#88c0d0] hover:text-[#5e81ac] dark:hover:text-[#5e81ac] transition-colors duration-200">
               Register here
             </a>
           </p>
@@ -127,4 +129,3 @@ function Login() {
 }
 
 export default Login
-

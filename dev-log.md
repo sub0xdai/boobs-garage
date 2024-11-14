@@ -192,7 +192,12 @@ Source map errors are cluttering the console, but main functionalities remain un
 
 ## Most important components to optimize first:
 - [x] Navigation/Navbar
-- [ ] Forms (especially login/feedback forms)
-- [ ] Service listings
-- [ ] Blog posts display
-- [ ] Admin dashboard critical functions
+- [x] Forms (especially login/feedback forms)
+- [x] Service listings
+- [x] Blog posts display
+- [x] Admin dashboard critical functions
+
+### Todo
+- Theme and styling feedback
+- Comment the code properly
+- 
