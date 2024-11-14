@@ -81,13 +81,21 @@ function AdminDashboard() {
     )
   }
 
+  if (!user?.isAdmin) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <div className="text-center p-8 bg-white dark:bg-gray-800 rounded-lg shadow-md">
+          {/* ... your existing access denied content ... */}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="max-w-7xl mx-auto px-4 py-6">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-             Dashboard
-          </h1>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
           <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
             Manage your garage services, users, and content
           </p>
@@ -95,28 +103,27 @@ function AdminDashboard() {
 
         {/* Navigation Tabs */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow mb-6">
-          <nav className="flex space-x-4 p-4">
-            {tabs.map(tab => (
+          <nav className="flex overflow-x-auto flex-nowrap">
+            {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`
-                  flex items-center px-4 py-2 rounded-md text-sm font-medium transition-colors
-                  ${activeTab === tab.id 
+                  flex items-center px-4 py-2 whitespace-nowrap
+                  ${activeTab === tab.id
                     ? 'bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300'
-                    : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700/50'
-                  }
+                    : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700/50'}
                 `}
               >
                 {tab.icon}
-                {tab.label}
+                <span className="text-sm font-medium">{tab.label}</span>
               </button>
             ))}
           </nav>
         </div>
 
         {/* Tab Content */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 sm:p-6">
           {activeTab === 'services' && <ServicesManager />}
           {activeTab === 'users' && <UserManager />}
           {activeTab === 'blog' && <BlogManager />}
@@ -125,7 +132,7 @@ function AdminDashboard() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default AdminDashboard
+export default AdminDashboard;

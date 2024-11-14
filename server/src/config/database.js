@@ -189,7 +189,6 @@ function initializeTables() {
       title TEXT NOT NULL,
       content TEXT NOT NULL,
       author_id INTEGER,
-      image_url TEXT,
       created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL,
       FOREIGN KEY (author_id) REFERENCES users(id)

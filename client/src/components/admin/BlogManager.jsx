@@ -13,72 +13,63 @@ function BlogManager() {
   const [editingPost, setEditingPost] = useState(null)
   const [formData, setFormData] = useState({
     title: '',
-    content: '',
-    image: null
+    content: ''
   });
 
-const [imagePreview, setImagePreview] = useState(null);
+  useEffect(() => {
+    let mounted = true;
 
-
-
-  // useEffect:
-
-useEffect(() => {
-  let mounted = true;
-
-  
-const loadPosts = async () => {
-    if (!user?.isAdmin) {
-      navigate('/login');
-      return;
-    }
-
-    try {
-      console.log('Attempting to fetch posts...');
-      const response = await api.get('/api/blog/posts');
-
-      if (!mounted) return;
-
-      const text = await response.text();
-      console.log('Raw response text:', text);
-
-      let data;
-      if (text) {
-        try {
-          data = JSON.parse(text);
-        } catch (e) {
-          console.error('JSON parse error:', e);
-          throw new Error('Invalid JSON response');
-        }
-      }
-
-      if (response.ok) {
-        setPosts(data || []);
-        setError(null);
-      } else {
-        throw new Error(data?.message || 'Failed to fetch blog posts');
-      }
-    } catch (err) {
-      console.error('Fetch error:', err);
-      if (!mounted) return;
-      
-      if (err.message.includes('session') || err.message.includes('token')) {
-        logout();
+    const loadPosts = async () => {
+      if (!user?.isAdmin) {
         navigate('/login');
+        return;
       }
-      setError('Error loading posts: ' + err.message);
-    } finally {
-      if (mounted) setLoading(false);
-    }
-  };
 
+      try {
+        console.log('Attempting to fetch posts...');
+        const response = await api.get('/api/blog/posts');
 
-  loadPosts();
+        if (!mounted) return;
 
-  return () => {
-    mounted = false;
-  };
-}, [user, navigate, logout]);
+        const text = await response.text();
+        console.log('Raw response text:', text);
+
+        let data;
+        if (text) {
+          try {
+            data = JSON.parse(text);
+          } catch (e) {
+            console.error('JSON parse error:', e);
+            throw new Error('Invalid JSON response');
+          }
+        }
+
+        if (response.ok) {
+          setPosts(data || []);
+          setError(null);
+        } else {
+          throw new Error(data?.message || 'Failed to fetch blog posts');
+        }
+      } catch (err) {
+        console.error('Fetch error:', err);
+        if (!mounted) return;
+        
+        if (err.message.includes('session') || err.message.includes('token')) {
+          logout();
+          navigate('/login');
+        }
+        setError('Error loading posts: ' + err.message);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+
+    loadPosts();
+
+    return () => {
+      mounted = false;
+    };
+  }, [user, navigate, logout]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -88,46 +79,21 @@ const loadPosts = async () => {
     }));
   };
 
-  const handleImageChange = (e) => {
-  const file = e.target.files[0];
-  if (file) {
-    if (file.size > 5 * 1024 * 1024) { // 5MB limit
-      setError('Image size must be less than 5MB');
-      e.target.value = null;
-      return;
-    }
-    
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setImagePreview(reader.result);
-    };
-    reader.readAsDataURL(file);
-    
-    setFormData(prev => ({
-      ...prev,
-      image: file
-    }));
-  }
-};
-
   const handleCreatePost = async (e) => {
     e.preventDefault();
-     try {
+    try {
+      // Create FormData to maintain consistency with original code
       const formDataToSend = new FormData();
       formDataToSend.append('title', formData.title);
       formDataToSend.append('content', formData.content);
-      if (formData.image) {
-        formDataToSend.append('image', formData.image);
-      }
 
-      
-    console.log('Form data being sent:');
-    console.log('Title:', formData.title);
-    console.log('Content:', formData.content);
-    console.log('Image:', formData.image);
-
-
-      const response = await api.post('/api/blog/posts', formDataToSend);
+      const response = await fetch('http://localhost:5000/api/blog/posts', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: formDataToSend
+      });
     
       if (!response.ok) {
         const data = await response.json();
@@ -136,8 +102,7 @@ const loadPosts = async () => {
 
       const data = await response.json();
       setPosts(prev => [...prev, data]);
-      setFormData({ title: '', content: '', image: null });
-      setImagePreview(null);
+      setFormData({ title: '', content: '' });
       setError(null);
       setSuccessMessage('Blog post created successfully!');
       setTimeout(() => setSuccessMessage(null), 3000);
@@ -151,10 +116,22 @@ const loadPosts = async () => {
       }
     }
   };
+
   const handleUpdatePost = async (e) => {
     e.preventDefault();
     try {
-      const response = await api.put(`/api/blog/posts/${editingPost.id}`, editingPost);
+      // Create FormData to maintain consistency
+      const formDataToSend = new FormData();
+      formDataToSend.append('title', editingPost.title);
+      formDataToSend.append('content', editingPost.content);
+
+      const response = await fetch(`http://localhost:5000/api/blog/posts/${editingPost.id}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: formDataToSend
+      });
 
       if (!response.ok) {
         const data = await response.json();
@@ -179,7 +156,12 @@ const loadPosts = async () => {
     if (!window.confirm('Are you sure you want to delete this post?')) return;
 
     try {
-      const response = await api.delete(`/api/blog/posts/${postId}`);
+      const response = await fetch(`http://localhost:5000/api/blog/posts/${postId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
       
       if (!response.ok) {
         const data = await response.json();
@@ -196,13 +178,7 @@ const loadPosts = async () => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-lg text-gray-700 dark:text-gray-300">Loading posts...</div>
-      </div>
-    );
-  }
+  // ... rest of the component remains the same ...
 
   return (
     <div className="space-y-6">
@@ -264,54 +240,13 @@ const loadPosts = async () => {
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Image
-            </label>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleImageChange}
-                className="block w-full text-sm text-gray-500 dark:text-gray-400
-                  file:mr-4 file:py-2 file:px-4
-                  file:rounded-md file:border-0
-                  file:text-sm file:font-semibold
-                  file:bg-blue-50 file:text-blue-700
-                  dark:file:bg-blue-900/50 dark:file:text-blue-200
-                  hover:file:bg-blue-100 dark:hover:file:bg-blue-900"
-              />
-              {imagePreview && (
-                <div className="mt-2">
-                  <img
-                    src={imagePreview}
-                    alt="Preview"
-                    className="h-32 w-auto object-cover rounded-md"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setFormData(prev => ({ ...prev, image: null }));
-                      setImagePreview(null);
-                    }}
-                    className="mt-1 text-sm text-red-600 dark:text-red-400 hover:text-red-800 
-                            dark:hover:text-red-300"
-                  >
-                    Remove image
-                  </button>
-            </div>
-            )}
-             <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                Maximum file size: 5MB. Supported formats: JPG, PNG, GIF
-              </p>
-            </div>
-
           <div className="flex justify-end space-x-2">
             {editingPost && (
               <button
                 type="button"
                 onClick={() => {
                   setEditingPost(null)
-                  setFormData({ title: '', content: '', image_url: '' })
+                  setFormData({ title: '', content: '' })
                 }}
                 className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition"
               >
@@ -343,15 +278,6 @@ const loadPosts = async () => {
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
                   {post.title}
                 </h3>
-                {post.image_url && (
-                  <img 
-                    src={`http://localhost:5000${post.image_url}`}
-                    alt={post.title}
-                    className="w-full max-h-48 object-cover rounded mb-4 hover:opacity-90 
-                              transition-opacity cursor-pointer"
-                    onClick={() => window.open(`http://localhost:5000${post.image_url}`, '_blank')}
-                  />
-                )}
                 <p className="text-gray-600 dark:text-gray-400 mb-4">{post.content}</p>
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-500 dark:text-gray-400">

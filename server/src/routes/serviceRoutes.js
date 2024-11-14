@@ -68,11 +68,11 @@ router.post('/', authMiddleware, adminMiddleware, async (req, res) => {
 
 // Update service (admin only)
 router.put('/:id', authMiddleware, adminMiddleware, async (req, res) => {
-  const { name, description, price } = req.body;
+  const { name, description, price, features = null } = req.body;
   const { id } = req.params;
   try {
     db.run(
-      'UPDATE services SET name = ?, description = ?, price = ?, updated_at = ? WHERE id = ?',
+      'UPDATE services SET name = ?, description = ?, price = ?, features = ?, updated_at = ? WHERE id = ?',
       [name, description, price, new Date().toISOString(), id],
       (err) => {
         if (err) {
