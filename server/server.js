@@ -19,6 +19,7 @@ import authRoutes from './src/routes/authRoutes.js';
 import blogRoutes from './src/routes/blogRoutes.js';
 import userPreferencesRoutes from './src/routes/userPreferencesRoutes.js';
 import homeImageRoutes from './src/routes/homeImageRoutes.js';
+import testRoute from './src/routes/testRoute.js';
 
 // Create uploads directory if it doesn't exist (single definition)
 const uploadsDir = path.join(__dirname, 'uploads');
@@ -51,6 +52,7 @@ app.use('/api/blog', blogRoutes);
 app.use('/api/feedback', feedbackRoutes);
 app.use('/api/preferences', userPreferencesRoutes);
 app.use('/api', homeImageRoutes);
+app.use('/test', testRoute);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
