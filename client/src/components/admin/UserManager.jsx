@@ -1,9 +1,11 @@
+// Import dependencies
 import { useState, useEffect } from 'react'
 import { api } from '../../utils/fetchWithAuth.js'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 
 function UserManager() {
+  // Initialize hooks and state management
   const { user, logout } = useAuth()
   const navigate = useNavigate()
   const [users, setUsers] = useState([])
@@ -11,10 +13,12 @@ function UserManager() {
   const [error, setError] = useState(null)
   const [successMessage, setSuccessMessage] = useState(null)
 
+  // Load users on component mount
   useEffect(() => {
     let mounted = true;
 
     const loadUsers = async () => {
+      // Check admin access
       if (!user?.isAdmin) {
         navigate('/login');
         return;
@@ -34,7 +38,7 @@ function UserManager() {
         }
       } catch (err) {
         if (!mounted) return;
-        console.error('Fetch error:', err);
+        // Handle authentication errors
         if (err.message.includes('session') || err.message.includes('token')) {
           logout();
           navigate('/login');
@@ -46,12 +50,10 @@ function UserManager() {
     };
 
     loadUsers();
-
-    return () => {
-      mounted = false;
-    };
+    return () => { mounted = false; };
   }, [user, navigate, logout]);
 
+  // Toggle admin privileges for users
   const toggleAdminStatus = async (userId) => {
     try {
       const response = await api.put(`/api/auth/users/${userId}/toggle-admin`);
@@ -65,6 +67,7 @@ function UserManager() {
         throw new Error(data.message || 'Failed to update user');
       }
 
+      // Update local state with new admin status
       const updatedUsers = users.map(u => {
         if (u.id === userId) {
           return { ...u, is_admin: !u.is_admin };
@@ -73,94 +76,97 @@ function UserManager() {
       });
       
       setUsers(updatedUsers);
-      setError(null);
       setSuccessMessage('User updated successfully!');
       setTimeout(() => setSuccessMessage(null), 3000);
     } catch (err) {
-      console.error('Update error:', err);
       setError('Error updating user: ' + err.message);
     }
   };
 
+  // Display loading state
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="text-lg text-gray-700 dark:text-gray-300">Loading users...</div>
+        <div className="text-lg text-[#2e3440] dark:text-[#d8dee9]">Loading users...</div>
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
+      {/* Error Alert */}
       {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+        <div className="bg-[#bf616a]/20 dark:bg-[#bf616a]/10 border border-[#bf616a] text-[#bf616a] px-4 py-3 rounded">
           {error}
         </div>
       )}
 
+      {/* Success Alert */}
       {successMessage && (
-        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
+        <div className="bg-[#a3be8c]/20 dark:bg-[#a3be8c]/10 border border-[#a3be8c] text-[#a3be8c] px-4 py-3 rounded">
           {successMessage}
         </div>
       )}
 
-      {/* Users List */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md">
+      {/* Users Table */}
+      <div className="bg-[#e5e9f0] dark:bg-[#3b4252] rounded-lg shadow-md transition-colors duration-200">
         <div className="p-6">
-          <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">Users</h2>
+          <h2 className="text-xl font-bold mb-4 text-[#2e3440] dark:text-[#d8dee9]">Users</h2>
           {users.length === 0 ? (
-            <p className="text-gray-600 dark:text-gray-400">No users found.</p>
+            <p className="text-[#4c566a] dark:text-[#81a1c1]">No users found.</p>
           ) : (
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                <thead className="bg-gray-50 dark:bg-gray-700">
+              <table className="min-w-full divide-y divide-[#d8dee9] dark:divide-[#4c566a]">
+                {/* Table Header */}
+                <thead className="bg-[#eceff4] dark:bg-[#434c5e]">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-[#4c566a] dark:text-[#81a1c1] uppercase tracking-wider">
                       Username
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-[#4c566a] dark:text-[#81a1c1] uppercase tracking-wider">
                       Email
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-[#4c566a] dark:text-[#81a1c1] uppercase tracking-wider">
                       Status
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-[#4c566a] dark:text-[#81a1c1] uppercase tracking-wider">
                       Created At
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-[#4c566a] dark:text-[#81a1c1] uppercase tracking-wider">
                       Actions
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                {/* Table Body */}
+                <tbody className="bg-[#e5e9f0] dark:bg-[#3b4252] divide-y divide-[#d8dee9] dark:divide-[#4c566a]">
                   {users.map(u => (
-                    <tr key={u.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                      <td className="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white">
+                    <tr key={u.id} className="hover:bg-[#eceff4] dark:hover:bg-[#434c5e] transition-colors duration-200">
+                      <td className="px-6 py-4 whitespace-nowrap text-[#2e3440] dark:text-[#d8dee9]">
                         {u.username}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white">
+                      <td className="px-6 py-4 whitespace-nowrap text-[#2e3440] dark:text-[#d8dee9]">
                         {u.email}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                           u.is_admin 
-                            ? 'bg-green-100 text-green-800 dark:bg-green-200 dark:text-green-900' 
-                            : 'bg-gray-100 text-gray-800 dark:bg-gray-200 dark:text-gray-900'
+                            ? 'bg-[#a3be8c]/20 text-[#a3be8c]' 
+                            : 'bg-[#81a1c1]/20 text-[#81a1c1]'
                         }`}>
                           {u.is_admin ? 'Admin' : 'User'}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white">
+                      <td className="px-6 py-4 whitespace-nowrap text-[#2e3440] dark:text-[#d8dee9]">
                         {new Date(u.created_at).toLocaleDateString()}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <button
                           onClick={() => toggleAdminStatus(u.id)}
                           disabled={u.id === user.id}
-                          className={`px-4 py-2 rounded ${
+                          className={`px-4 py-2 rounded transition-all duration-200 ${
                             u.id === user.id
-                              ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                              : 'bg-blue-600 text-white hover:bg-blue-700 transition'
+                              ? 'bg-[#4c566a] text-[#d8dee9] cursor-not-allowed opacity-50'
+                              : 'bg-[#8fbcbb] text-white hover:bg-[#88c0d0] hover:shadow-md active:scale-98'
                           }`}
                         >
                           Toggle Admin

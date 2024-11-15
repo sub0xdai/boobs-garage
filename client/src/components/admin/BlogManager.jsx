@@ -1,9 +1,11 @@
+// Import dependencies
 import { useState, useEffect } from 'react'
 import { api } from '../../utils/fetchWithAuth.js'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 
 function BlogManager() {
+  // Initialize hooks and state
   const { user, logout } = useAuth()
   const navigate = useNavigate()
   const [posts, setPosts] = useState([])
@@ -16,33 +18,23 @@ function BlogManager() {
     content: ''
   });
 
+  // Load blog posts on component mount
   useEffect(() => {
     let mounted = true;
 
     const loadPosts = async () => {
+      // Check admin access
       if (!user?.isAdmin) {
         navigate('/login');
         return;
       }
 
       try {
-        console.log('Attempting to fetch posts...');
         const response = await api.get('/api/blog/posts');
-
         if (!mounted) return;
 
         const text = await response.text();
-        console.log('Raw response text:', text);
-
-        let data;
-        if (text) {
-          try {
-            data = JSON.parse(text);
-          } catch (e) {
-            console.error('JSON parse error:', e);
-            throw new Error('Invalid JSON response');
-          }
-        }
+        let data = text ? JSON.parse(text) : null;
 
         if (response.ok) {
           setPosts(data || []);
@@ -51,26 +43,18 @@ function BlogManager() {
           throw new Error(data?.message || 'Failed to fetch blog posts');
         }
       } catch (err) {
-        console.error('Fetch error:', err);
         if (!mounted) return;
-        
-        if (err.message.includes('session') || err.message.includes('token')) {
-          logout();
-          navigate('/login');
-        }
-        setError('Error loading posts: ' + err.message);
+        handleError(err);
       } finally {
         if (mounted) setLoading(false);
       }
     };
 
     loadPosts();
-
-    return () => {
-      mounted = false;
-    };
+    return () => { mounted = false };
   }, [user, navigate, logout]);
 
+  // Handle form input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -79,10 +63,20 @@ function BlogManager() {
     }));
   };
 
+  // Error handling utility
+  const handleError = (err) => {
+    console.error('Operation error:', err);
+    if (err.message.includes('session') || err.message.includes('token')) {
+      logout();
+      navigate('/login');
+    }
+    setError(err.message);
+  };
+
+  // Create new blog post
   const handleCreatePost = async (e) => {
     e.preventDefault();
     try {
-      // Create FormData to maintain consistency with original code
       const formDataToSend = new FormData();
       formDataToSend.append('title', formData.title);
       formDataToSend.append('content', formData.content);
@@ -95,32 +89,22 @@ function BlogManager() {
         body: formDataToSend
       });
     
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.message || 'Failed to create post');
-      }
-
       const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'Failed to create post');
+
       setPosts(prev => [...prev, data]);
       setFormData({ title: '', content: '' });
-      setError(null);
       setSuccessMessage('Blog post created successfully!');
       setTimeout(() => setSuccessMessage(null), 3000);
     } catch (err) {
-      console.error('Create post error:', err);
-      setError(`Error creating post: ${err.message}`);
-    
-      if (err.message.includes('session') || err.message.includes('token')) {
-        logout();
-        navigate('/login');
-      }
+      handleError(err);
     }
   };
 
+  // Update existing blog post
   const handleUpdatePost = async (e) => {
     e.preventDefault();
     try {
-      // Create FormData to maintain consistency
       const formDataToSend = new FormData();
       formDataToSend.append('title', editingPost.title);
       formDataToSend.append('content', editingPost.content);
@@ -133,25 +117,19 @@ function BlogManager() {
         body: formDataToSend
       });
 
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.message || 'Failed to update post');
-      }
-
       const data = await response.json();
-      setPosts(prev => prev.map(post => 
-        post.id === editingPost.id ? data : post
-      ));
+      if (!response.ok) throw new Error(data.message);
+
+      setPosts(prev => prev.map(post => post.id === editingPost.id ? data : post));
       setEditingPost(null);
-      setError(null);
       setSuccessMessage('Post updated successfully!');
       setTimeout(() => setSuccessMessage(null), 3000);
     } catch (err) {
-      console.error('Update error:', err);
-      setError('Error updating post: ' + err.message);
+      handleError(err);
     }
   };
 
+  // Delete blog post
   const handleDeletePost = async (postId) => {
     if (!window.confirm('Are you sure you want to delete this post?')) return;
 
@@ -165,31 +143,37 @@ function BlogManager() {
       
       if (!response.ok) {
         const data = await response.json();
-        throw new Error(data.message || 'Failed to delete post');
+        throw new Error(data.message);
       }
 
       setPosts(prev => prev.filter(post => post.id !== postId));
-      setError(null);
       setSuccessMessage('Post deleted successfully!');
       setTimeout(() => setSuccessMessage(null), 3000);
     } catch (err) {
-      console.error('Delete error:', err);
-      setError('Error deleting post: ' + err.message);
+      handleError(err);
     }
   };
 
-  // ... rest of the component remains the same ...
+  // Loading state
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-lg text-[#2e3440] dark:text-[#d8dee9]">Loading posts...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
+      {/* Alert Messages */}
       {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+        <div className="bg-[#bf616a]/20 dark:bg-[#bf616a]/10 border border-[#bf616a] text-[#bf616a] px-4 py-3 rounded">
           {error}
         </div>
       )}
 
       {successMessage && (
-        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
+        <div className="bg-[#a3be8c]/20 dark:bg-[#a3be8c]/10 border border-[#a3be8c] text-[#a3be8c] px-4 py-3 rounded">
           {successMessage}
         </div>
       )}
@@ -197,15 +181,16 @@ function BlogManager() {
       {/* Blog Post Form */}
       <form 
         onSubmit={editingPost ? handleUpdatePost : handleCreatePost}
-        className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md"
+        className="bg-[#e5e9f0] dark:bg-[#3b4252] p-6 rounded-lg shadow-md transition-colors duration-200"
       >
-        <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">
+        <h2 className="text-xl font-bold mb-4 text-[#2e3440] dark:text-[#d8dee9]">
           {editingPost ? 'Edit Blog Post' : 'Add New Blog Post'}
         </h2>
         
         <div className="space-y-4">
+          {/* Title Input */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-sm font-medium text-[#4c566a] dark:text-[#81a1c1] mb-1">
               Title
             </label>
             <input
@@ -216,14 +201,17 @@ function BlogManager() {
                 (e) => setEditingPost({...editingPost, title: e.target.value}) : 
                 handleInputChange
               }
-              className="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 
-                       dark:text-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full px-3 py-2 border rounded-md transition-all duration-200
+                       focus:outline-none focus:ring-1 focus:ring-[#8fbcbb] dark:focus:ring-[#88c0d0]
+                       bg-white dark:bg-[#2e3440] border-[#d8dee9] dark:border-[#4c566a]
+                       text-[#2e3440] dark:text-[#d8dee9]"
               required
             />
           </div>
 
+          {/* Content Input */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-sm font-medium text-[#4c566a] dark:text-[#81a1c1] mb-1">
               Content
             </label>
             <textarea
@@ -233,13 +221,16 @@ function BlogManager() {
                 (e) => setEditingPost({...editingPost, content: e.target.value}) : 
                 handleInputChange
               }
-              className="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 
-                       dark:text-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full px-3 py-2 border rounded-md transition-all duration-200
+                       focus:outline-none focus:ring-1 focus:ring-[#8fbcbb] dark:focus:ring-[#88c0d0]
+                       bg-white dark:bg-[#2e3440] border-[#d8dee9] dark:border-[#4c566a]
+                       text-[#2e3440] dark:text-[#d8dee9]"
               rows="6"
               required
             />
           </div>
 
+          {/* Form Actions */}
           <div className="flex justify-end space-x-2">
             {editingPost && (
               <button
@@ -248,14 +239,16 @@ function BlogManager() {
                   setEditingPost(null)
                   setFormData({ title: '', content: '' })
                 }}
-                className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition"
+                className="px-4 py-2 bg-[#4c566a] hover:bg-[#434c5e] text-white rounded 
+                        transition-all duration-200 shadow-md hover:shadow-lg active:scale-98"
               >
                 Cancel
               </button>
             )}
             <button
               type="submit"
-              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+              className="px-4 py-2 bg-[#8fbcbb] hover:bg-[#88c0d0] text-white rounded 
+                      transition-all duration-200 shadow-md hover:shadow-lg active:scale-98"
             >
               {editingPost ? 'Update Post' : 'Add Post'}
             </button>
@@ -264,37 +257,35 @@ function BlogManager() {
       </form>
 
       {/* Posts List */}
-      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
-        <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">Blog Posts</h2>
+      <div className="bg-[#e5e9f0] dark:bg-[#3b4252] p-6 rounded-lg shadow-md transition-colors duration-200">
+        <h2 className="text-xl font-bold mb-4 text-[#2e3440] dark:text-[#d8dee9]">Blog Posts</h2>
         {posts.length === 0 ? (
-          <p className="text-gray-600 dark:text-gray-400">No blog posts found.</p>
+          <p className="text-[#4c566a] dark:text-[#81a1c1]">No blog posts found.</p>
         ) : (
           <div className="space-y-6">
             {posts.map(post => (
               <div 
                 key={post.id}
-                className="border-b dark:border-gray-700 pb-6 last:border-0 last:pb-0"
+                className="border-b border-[#d8dee9] dark:border-[#4c566a] pb-6 last:border-0 last:pb-0"
               >
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+                <h3 className="text-lg font-medium text-[#2e3440] dark:text-[#d8dee9] mb-2">
                   {post.title}
                 </h3>
-                <p className="text-gray-600 dark:text-gray-400 mb-4">{post.content}</p>
+                <p className="text-[#4c566a] dark:text-[#81a1c1] mb-4">{post.content}</p>
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-500 dark:text-gray-400">
+                  <span className="text-sm text-[#4c566a] dark:text-[#81a1c1]">
                     Posted on {new Date(post.created_at).toLocaleDateString()}
                   </span>
                   <div className="space-x-2">
                     <button
                       onClick={() => setEditingPost(post)}
-                      className="text-blue-600 hover:text-blue-800 dark:text-blue-400 
-                               dark:hover:text-blue-300"
+                      className="text-[#8fbcbb] hover:text-[#88c0d0] transition-colors duration-200"
                     >
                       Edit
                     </button>
                     <button
                       onClick={() => handleDeletePost(post.id)}
-                      className="text-red-600 hover:text-red-800 dark:text-red-400 
-                               dark:hover:text-red-300"
+                      className="text-[#bf616a] hover:text-[#d08770] transition-colors duration-200"
                     >
                       Delete
                     </button>
@@ -309,4 +300,4 @@ function BlogManager() {
   );
 }
 
-export default BlogManager
+export default BlogManager;

@@ -1,8 +1,9 @@
-// client/src/components/admin/HomeImageManager.jsx
+// Import dependencies
 import React, { useState, useEffect } from 'react';
 import { api } from '../../utils/fetchWithAuth.js';
 
 export default function HomeImageManager() {
+  // Initialize state
   const [currentImage, setCurrentImage] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -10,10 +11,12 @@ export default function HomeImageManager() {
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
 
+  // Fetch current image on component mount
   useEffect(() => {
     fetchCurrentImage();
   }, []);
 
+  // Get current homepage image
   const fetchCurrentImage = async () => {
     try {
       const response = await api.get('/api/home-image');
@@ -29,10 +32,11 @@ export default function HomeImageManager() {
     }
   };
 
+  // Handle image file selection
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+      if (file.size > 5 * 1024 * 1024) {
         setError('Image size must be less than 5MB');
         e.target.value = null;
         return;
@@ -49,6 +53,7 @@ export default function HomeImageManager() {
     }
   };
 
+  // Handle image upload
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!imageFile) {
@@ -85,54 +90,58 @@ export default function HomeImageManager() {
 
   return (
     <div className="space-y-6">
+      {/* Alert Messages */}
       {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+        <div className="bg-[#bf616a]/20 dark:bg-[#bf616a]/10 border border-[#bf616a] text-[#bf616a] px-4 py-3 rounded">
           {error}
         </div>
       )}
 
       {successMessage && (
-        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
+        <div className="bg-[#a3be8c]/20 dark:bg-[#a3be8c]/10 border border-[#a3be8c] text-[#a3be8c] px-4 py-3 rounded">
           {successMessage}
         </div>
       )}
 
+      {/* Current Image Display */}
       {currentImage?.imageUrl && (
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+        <div className="bg-[#e5e9f0] dark:bg-[#3b4252] p-6 rounded-lg shadow-md transition-colors duration-200">
+          <h3 className="text-lg font-medium text-[#2e3440] dark:text-[#d8dee9] mb-2">
             Current Image
           </h3>
           <img 
             src={`http://localhost:5000${currentImage.imageUrl}`}
             alt="Current home page"
             className="w-full max-h-48 object-cover rounded mb-4 hover:opacity-90 
-                      transition-opacity cursor-pointer"
+                      transition-all duration-200 cursor-pointer"
             onClick={() => window.open(`http://localhost:5000${currentImage.imageUrl}`, '_blank')}
           />
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
-        <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">
+      {/* Upload Form */}
+      <form onSubmit={handleSubmit} className="bg-[#e5e9f0] dark:bg-[#3b4252] p-6 rounded-lg shadow-md transition-colors duration-200">
+        <h2 className="text-xl font-bold mb-4 text-[#2e3440] dark:text-[#d8dee9]">
           Update Home Page Image
         </h2>
 
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-sm font-medium text-[#4c566a] dark:text-[#81a1c1] mb-1">
               Image
             </label>
             <input
               type="file"
               accept="image/*"
               onChange={handleImageChange}
-              className="block w-full text-sm text-gray-500 dark:text-gray-400
+              className="block w-full text-sm text-[#4c566a] dark:text-[#81a1c1]
                 file:mr-4 file:py-2 file:px-4
                 file:rounded-md file:border-0
                 file:text-sm file:font-semibold
-                file:bg-blue-50 file:text-blue-700
-                dark:file:bg-blue-900/50 dark:file:text-blue-200
-                hover:file:bg-blue-100 dark:hover:file:bg-blue-900"
+                file:bg-[#88c0d0]/10 file:text-[#88c0d0]
+                dark:file:bg-[#88c0d0]/10 dark:file:text-[#88c0d0]
+                hover:file:bg-[#88c0d0]/20 dark:hover:file:bg-[#88c0d0]/20
+                transition-all duration-200"
             />
             {imagePreview && (
               <div className="mt-2">
@@ -147,14 +156,13 @@ export default function HomeImageManager() {
                     setImageFile(null);
                     setImagePreview(null);
                   }}
-                  className="mt-1 text-sm text-red-600 dark:text-red-400 hover:text-red-800 
-                          dark:hover:text-red-300"
+                  className="mt-1 text-sm text-[#bf616a] hover:text-[#d08770] transition-colors duration-200"
                 >
                   Remove image
                 </button>
               </div>
             )}
-            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            <p className="mt-1 text-sm text-[#4c566a] dark:text-[#81a1c1]">
               Maximum file size: 5MB. Supported formats: JPG, PNG, GIF
             </p>
           </div>
@@ -163,10 +171,10 @@ export default function HomeImageManager() {
             <button
               type="submit"
               disabled={loading || !imageFile}
-              className={`px-4 py-2 text-white rounded 
+              className={`px-4 py-2 text-white rounded transition-all duration-200
                 ${(loading || !imageFile) 
-                  ? 'bg-blue-400 cursor-not-allowed' 
-                  : 'bg-blue-600 hover:bg-blue-700 transition'}`}
+                  ? 'bg-[#4c566a] cursor-not-allowed opacity-50' 
+                  : 'bg-[#88c0d0] hover:bg-[#8fbcbb] shadow-md hover:shadow-lg active:scale-98'}`}
             >
               {loading ? 'Uploading...' : 'Update Image'}
             </button>

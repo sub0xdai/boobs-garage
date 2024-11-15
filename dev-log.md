@@ -1,3 +1,4 @@
+
 # 10.29
 - Set up structure of project yesterday
     - Architecture:
@@ -200,4 +201,8 @@ Source map errors are cluttering the console, but main functionalities remain un
 ### Todo
 - Theme and styling feedback
 - Comment the code properly
-- 
+
+# 11.15
+- Iron out last bugs
+- Fill out that hellish doc
+- Add some assets 
