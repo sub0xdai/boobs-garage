@@ -1,4 +1,5 @@
-
+# DEVLOG
+---
 # 10.29
 - Set up structure of project yesterday
     - Architecture:
