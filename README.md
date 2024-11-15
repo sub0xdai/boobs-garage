@@ -1,5 +1,12 @@
+# Bob's Garage
 
-# Bob's Garage Technical Architecture
+Bob's Garage is a full-stack web application that provides an online presence for a mechanics workshop. It allows customers to view services, prices, staff information, and company history, as well as leave feedback and read blog posts. The application also enables the workshop owner, Bob, to easily update prices and post blog content.
+
+## Features
+- Public-facing pages for company info, services, and blog
+- User authentication and authorization
+- Customer feedback system with image support
+- Admin dashboard for managing services, blog, and user feedback
 
 ## Tech Stack
 - **Frontend**: React (Vite), Tailwind CSS, React Router, React Hook Form, Yup
@@ -9,11 +16,46 @@
 - `client/`: React app with pages, components, context, and utils
 - `server/`: Express app with routes, controllers, middleware, and models
 
-## Key Features
-1. **Authentication**: JWT-based auth with protected routes
-2. **Theme System**: Tailwind-powered dark/light modes with the 'nord' palette
-3. **Database**: SQLite for storing users, services, blog posts, feedback
-4. **File Uploads**: Multer-based handling for blog images
+## Getting Started
+
+### Prerequisites
+- Node.js (version 14 or higher)
+- npm (version 6 or higher)
+- SQLite
+
+### Installation
+1. Clone the repository:
+   ```
+   git clone https://github.com/your-username/bobs-garage.git
+   ```
+2. Navigate to the project directory:
+   ```
+   cd bobs-garage
+   ```
+3. Install the dependencies:
+   - For the client:
+     ```
+     cd client
+     npm install
+     ```
+   - For the server:
+     ```
+     cd server
+     npm install
+     ```
+
+### Running the Application
+1. Start the backend server:
+   ```
+   cd server
+   node server.js
+   ```
+2. Start the frontend development server:
+   ```
+   cd client
+   npm run dev
+   ```
+3. The application should now be accessible at `http://localhost:5173`.
 
 ## Configuration
 - **Vite**: HMR, React plugin, source maps
@@ -26,3 +68,7 @@
 - **API Testing**: Postman
 - **Debugging**: Browser DevTools
 - **DB Management**: SQLite Browser
+
+
+
+
