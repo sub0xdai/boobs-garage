@@ -26,11 +26,11 @@ Bob's Garage is a full-stack web application that provides an online presence fo
 ### Installation
 1. Clone the repository:
    ```
-   git clone https://github.com/your-username/bobs-garage.git
+   git clone git@github.com:sub0xdai/boobs-garage.git
    ```
 2. Navigate to the project directory:
    ```
-   cd bobs-garage
+   cd boobs-garage
    ```
 3. Install the dependencies:
    - For the client:
