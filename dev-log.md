@@ -161,7 +161,7 @@ Less Critical:
 
 ## Issues
 - Added bob ability to fix home page
-```bash
+```
 Server routes for /api/home-image and /api/home-image/upload are missing, causing 404 errors on frontend requests.
 ```
 - Need Staff (meet the team) page (4 staff, bob, 2 mechanics and an admin)
@@ -207,3 +207,28 @@ Source map errors are cluttering the console, but main functionalities remain un
 - Iron out last bugs
 - Fill out that hellish doc
 - Add some assets 
+
+# 11.23
+- Making some additional changes as per feedback
+    - Fixed styling issues
+    - Navbar: Drop down menu for About
+    - Footer: Added additional links that I missed
+    - Completed navigation review:
+        - Verified all navigation links are working and meaningful
+        - Ensured consistent Nord theme styling for all links (no default HTML colors)
+        - Added missing links (About Us, Our Team, Privacy Policy, Terms of Service)
+    - Website structure:
+        - Implemented clearly defined sections throughout the site
+        - Proper visual hierarchy with consistent Nord theme styling
+        - Clear section organization in Home, Services, Blog, and Admin pages
+
+# Future Plans
+- The current implementation (Bob's Garage) serves as a template/prototype
+- Structure and components are designed to be adaptable for different business use cases
+- Key reusable features:
+    - User authentication system
+    - Admin dashboard with content management
+    - Blog system
+    - Service showcase
+    - Contact and feedback systems
+    - Responsive design with Nord theme

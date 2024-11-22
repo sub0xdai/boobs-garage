@@ -56,7 +56,7 @@ function Login() {
               type="email"
               className={`w-full px-3 py-2 border rounded-md transition-all duration-200
                        focus:outline-none focus:ring-1 focus:ring-[#8fbcbb] dark:focus:ring-[#88c0d0]
-                       bg-white dark:bg-[#2e3440] border-[#d8dee9] dark:border-[#4c566a] 
+                       bg-[#eceff4] dark:bg-[#2e3440] border-[#d8dee9] dark:border-[#4c566a] 
                        text-[#2e3440] dark:text-[#d8dee9] placeholder-[#4c566a] dark:placeholder-[#81a1c1]
                        ${errors.email ? 'border-[#bf616a] dark:border-[#bf616a]' : ''}`}
               placeholder="your@email.com"
@@ -81,7 +81,7 @@ function Login() {
               type="password"
               className={`w-full px-3 py-2 border rounded-md transition-all duration-200
                        focus:outline-none focus:ring-1 focus:ring-[#8fbcbb] dark:focus:ring-[#88c0d0]
-                       bg-white dark:bg-[#2e3440] border-[#d8dee9] dark:border-[#4c566a] 
+                       bg-[#eceff4] dark:bg-[#2e3440] border-[#d8dee9] dark:border-[#4c566a] 
                        text-[#2e3440] dark:text-[#d8dee9] placeholder-[#4c566a] dark:placeholder-[#81a1c1]
                        ${errors.password ? 'border-[#bf616a] dark:border-[#bf616a]' : ''}`}
               placeholder="••••••••"
@@ -96,7 +96,7 @@ function Login() {
               <input
                 type="checkbox"
                 className="h-4 w-4 text-[#8fbcbb] dark:text-[#88c0d0] border-[#d8dee9] dark:border-[#4c566a] rounded
-                         focus:ring-[#8fbcbb] dark:focus:ring-[#88c0d0] bg-white dark:bg-[#2e3440] transition-colors duration-200"
+                         focus:ring-[#8fbcbb] dark:focus:ring-[#88c0d0] bg-[#eceff4] dark:bg-[#2e3440] transition-colors duration-200"
               />
               <label className="ml-2 text-sm text-[#4c566a] dark:text-[#81a1c1]">Remember me</label>
             </div>
@@ -107,7 +107,7 @@ function Login() {
 
           <button
             type="submit"
-            className="w-full bg-[#d08770] dark:bg-[#bf616a] text-white py-2 px-4 rounded-md 
+            className="w-full bg-[#d08770] dark:bg-[#bf616a] text-[#eceff4] py-2 px-4 rounded-md 
                      hover:bg-[#c97a65] dark:hover:bg-[#a9545d] transition-all duration-200
                      shadow-md hover:shadow-lg active:scale-98"
           >

@@ -44,20 +44,20 @@ function Register() {
   }
 
   return (
-    <div className="max-w-md mx-auto">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8">
-        <h1 className="text-3xl font-bold mb-6 text-gray-900 dark:text-white">Create Account</h1>
+    <div className="max-w-md mx-auto mt-8">
+      <div className="bg-[#e5e9f0] dark:bg-[#3b4252] rounded-lg shadow-md p-8 transition-colors duration-200">
+        <h1 className="text-3xl font-bold mb-6 text-[#2e3440] dark:text-[#eceff4]">Create Account</h1>
         
         {registerError && (
-          <div className="bg-red-100 dark:bg-red-900 border border-red-400 dark:border-red-700 
-                         text-red-700 dark:text-red-200 px-4 py-3 rounded mb-4">
+          <div className="bg-[#bf616a] bg-opacity-20 dark:bg-opacity-30 border border-[#bf616a] 
+                         text-[#bf616a] dark:text-[#d08770] px-4 py-3 rounded mb-4">
             {registerError}
           </div>
         )}
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-sm font-medium text-[#4c566a] dark:text-[#e5e9f0] mb-1">
               Full Name
             </label>
             <input 
@@ -69,18 +69,20 @@ function Register() {
                 }
               })}
               type="text" 
-              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 
-                dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500 dark:placeholder-gray-400
-                ${errors.fullName ? 'border-red-500 dark:border-red-500' : 'border-gray-300 dark:border-gray-600'}`}
+              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-1 
+                bg-[#eceff4] dark:bg-[#4c566a] border-[#d8dee9] dark:border-[#4c566a] 
+                text-[#2e3440] dark:text-[#eceff4] focus:ring-[#88c0d0] dark:focus:ring-[#88c0d0] 
+                placeholder-[#9097a3] dark:placeholder-[#d8dee9]
+                ${errors.fullName ? 'border-[#bf616a] dark:border-[#bf616a]' : ''}`}
               placeholder="John Doe"
             />
             {errors.fullName && (
-              <p className="mt-1 text-sm text-red-500 dark:text-red-400">{errors.fullName.message}</p>
+              <p className="mt-1 text-sm text-[#bf616a] dark:text-[#d08770]">{errors.fullName.message}</p>
             )}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-sm font-medium text-[#4c566a] dark:text-[#e5e9f0] mb-1">
               Email
             </label>
             <input 
@@ -92,18 +94,20 @@ function Register() {
                 }
               })}
               type="email" 
-              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 
-                dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500 dark:placeholder-gray-400
-                ${errors.email ? 'border-red-500 dark:border-red-500' : 'border-gray-300 dark:border-gray-600'}`}
+              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-1 
+                bg-[#eceff4] dark:bg-[#4c566a] border-[#d8dee9] dark:border-[#4c566a] 
+                text-[#2e3440] dark:text-[#eceff4] focus:ring-[#88c0d0] dark:focus:ring-[#88c0d0] 
+                placeholder-[#9097a3] dark:placeholder-[#d8dee9]
+                ${errors.email ? 'border-[#bf616a] dark:border-[#bf616a]' : ''}`}
               placeholder="your@email.com"
             />
             {errors.email && (
-              <p className="mt-1 text-sm text-red-500 dark:text-red-400">{errors.email.message}</p>
+              <p className="mt-1 text-sm text-[#bf616a] dark:text-[#d08770]">{errors.email.message}</p>
             )}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-sm font-medium text-[#4c566a] dark:text-[#e5e9f0] mb-1">
               Password
             </label>
             <input 
@@ -115,18 +119,20 @@ function Register() {
                 }
               })}
               type="password" 
-              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 
-                dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500 dark:placeholder-gray-400
-                ${errors.password ? 'border-red-500 dark:border-red-500' : 'border-gray-300 dark:border-gray-600'}`}
+              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-1 
+                bg-[#eceff4] dark:bg-[#4c566a] border-[#d8dee9] dark:border-[#4c566a] 
+                text-[#2e3440] dark:text-[#eceff4] focus:ring-[#88c0d0] dark:focus:ring-[#88c0d0] 
+                placeholder-[#9097a3] dark:placeholder-[#d8dee9]
+                ${errors.password ? 'border-[#bf616a] dark:border-[#bf616a]' : ''}`}
               placeholder="••••••••"
             />
             {errors.password && (
-              <p className="mt-1 text-sm text-red-500 dark:text-red-400">{errors.password.message}</p>
+              <p className="mt-1 text-sm text-[#bf616a] dark:text-[#d08770]">{errors.password.message}</p>
             )}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-sm font-medium text-[#4c566a] dark:text-[#e5e9f0] mb-1">
               Confirm Password
             </label>
             <input 
@@ -135,13 +141,15 @@ function Register() {
                 validate: value => value === password || 'Passwords do not match'
               })}
               type="password" 
-              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 
-                dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500 dark:placeholder-gray-400
-                ${errors.confirmPassword ? 'border-red-500 dark:border-red-500' : 'border-gray-300 dark:border-gray-600'}`}
+              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-1 
+                bg-[#eceff4] dark:bg-[#4c566a] border-[#d8dee9] dark:border-[#4c566a] 
+                text-[#2e3440] dark:text-[#eceff4] focus:ring-[#88c0d0] dark:focus:ring-[#88c0d0] 
+                placeholder-[#9097a3] dark:placeholder-[#d8dee9]
+                ${errors.confirmPassword ? 'border-[#bf616a] dark:border-[#bf616a]' : ''}`}
               placeholder="••••••••"
             />
             {errors.confirmPassword && (
-              <p className="mt-1 text-sm text-red-500 dark:text-red-400">{errors.confirmPassword.message}</p>
+              <p className="mt-1 text-sm text-[#bf616a] dark:text-[#d08770]">{errors.confirmPassword.message}</p>
             )}
           </div>
 
@@ -149,37 +157,37 @@ function Register() {
             <input 
               {...register('terms', { required: 'You must accept the terms' })}
               type="checkbox" 
-              className="h-4 w-4 text-blue-600 dark:text-blue-500 border-gray-300 dark:border-gray-600 rounded
-                         focus:ring-blue-500 dark:focus:ring-blue-400 bg-white dark:bg-gray-700"
+              className="h-4 w-4 text-[#88c0d0] dark:text-[#88c0d0] border-[#d8dee9] dark:border-[#4c566a] rounded
+                         focus:ring-[#88c0d0] dark:focus:ring-[#88c0d0] bg-[#eceff4] dark:bg-[#4c566a]"
             />
-            <label className="ml-2 text-sm text-gray-600 dark:text-gray-400">
+            <label className="ml-2 text-sm text-[#4c566a] dark:text-[#e5e9f0]">
               I agree to the{' '}
-              <a href="#" className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300">
+              <a href="#" className="text-[#5e81ac] dark:text-[#88c0d0] hover:text-[#81a1c1] dark:hover:text-[#8fbcbb] transition-colors duration-200">
                 Terms of Service
               </a>
               {' '}and{' '}
-              <a href="#" className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300">
+              <a href="#" className="text-[#5e81ac] dark:text-[#88c0d0] hover:text-[#81a1c1] dark:hover:text-[#8fbcbb] transition-colors duration-200">
                 Privacy Policy
               </a>
             </label>
           </div>
           {errors.terms && (
-            <p className="text-sm text-red-500 dark:text-red-400">{errors.terms.message}</p>
+            <p className="text-sm text-[#bf616a] dark:text-[#d08770]">{errors.terms.message}</p>
           )}
 
           <button 
             type="submit"
-            className="w-full bg-blue-600 dark:bg-blue-500 text-white py-2 px-4 rounded-md 
-                     hover:bg-blue-700 dark:hover:bg-blue-600 transition"
+            className="w-full bg-[#d08770] dark:bg-[#bf616a] text-white py-2 px-4 rounded-md 
+                     hover:bg-[#bf616a] dark:hover:bg-[#d08770] transition-all duration-200"
           >
             Create Account
           </button>
         </form>
 
         <div className="mt-6 text-center">
-          <p className="text-sm text-gray-600 dark:text-gray-400">
+          <p className="text-sm text-[#4c566a] dark:text-[#e5e9f0]">
             Already have an account?{' '}
-            <a href="/login" className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300">
+            <a href="/login" className="text-[#5e81ac] dark:text-[#88c0d0] hover:text-[#81a1c1] dark:hover:text-[#8fbcbb] transition-colors duration-200">
               Sign in here
             </a>
           </p>

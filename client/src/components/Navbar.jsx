@@ -13,8 +13,13 @@ function Navbar() {
     { to: '/blog', label: 'Blog' },
     { to: '/contact', label: 'Contact' },
     { to: '/feedback', label: 'Feedback' },
-    { to: '/staff', label: 'Our Team' },
-    { to: '/about', label: 'About Us' }
+    { 
+      label: 'About',
+      children: [
+        { to: '/about', label: 'About Us' },
+        { to: '/staff', label: 'Our Team' }
+      ]
+    }
   ];
 
   return (
@@ -62,13 +67,37 @@ function Navbar() {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-6">
             {navLinks.map((link) => (
-              <Link
-                key={link.to}
-                to={link.to}
-                className="text-[#4c566a] dark:text-[#81a1c1] hover:text-[#8fbcbb] dark:hover:text-[#8fbcbb] hover:bg-[#d8dee9] dark:hover:bg-[#434c5e] px-3 py-2 rounded-md transition-all duration-200"
-              >
-                {link.label}
-              </Link>
+              link.children ? (
+                <div key={link.label} className="relative group">
+                  <button className="text-[#4c566a] dark:text-[#81a1c1] hover:text-[#8fbcbb] dark:hover:text-[#8fbcbb] hover:bg-[#d8dee9] dark:hover:bg-[#434c5e] px-3 py-2 rounded-md transition-all duration-200 flex items-center">
+                    {link.label}
+                    <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                  <div className="absolute left-0 mt-2 w-48 rounded-md shadow-lg bg-white dark:bg-[#3b4252] ring-1 ring-black ring-opacity-5 hidden group-hover:block">
+                    <div className="py-1">
+                      {link.children.map((child) => (
+                        <Link
+                          key={child.to}
+                          to={child.to}
+                          className="block px-4 py-2 text-sm text-[#4c566a] dark:text-[#81a1c1] hover:text-[#8fbcbb] dark:hover:text-[#8fbcbb] hover:bg-[#d8dee9] dark:hover:bg-[#434c5e]"
+                        >
+                          {child.label}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <Link
+                  key={link.to}
+                  to={link.to}
+                  className="text-[#4c566a] dark:text-[#81a1c1] hover:text-[#8fbcbb] dark:hover:text-[#8fbcbb] hover:bg-[#d8dee9] dark:hover:bg-[#434c5e] px-3 py-2 rounded-md transition-all duration-200 hover:underline decoration-2 underline-offset-4"
+                >
+                  {link.label}
+                </Link>
+              )
             ))}
 
             {user ? (
@@ -99,6 +128,12 @@ function Navbar() {
                 >
                   Login
                 </Link>
+                <Link
+                  to="/register"
+                  className="text-[#d08770] dark:text-[#bf616a] hover:text-white hover:bg-[#d08770] dark:hover:bg-[#bf616a] px-4 py-2 rounded-md transition-all duration-200 font-medium"
+                >
+                  Register
+                </Link>
                 <div className="pl-2">
                   <ThemeToggle />
                 </div>
@@ -111,16 +146,34 @@ function Navbar() {
         {isMenuOpen && (
           <div className="md:hidden bg-[#eceff4] dark:bg-[#434c5e] border-t border-[#d8dee9] dark:border-[#2e3440] transition-colors duration-200">
             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.to}
-                  to={link.to}
-                  onClick={() => setIsMenuOpen(false)}
-                  className="block text-[#4c566a] dark:text-[#81a1c1] hover:text-[#8fbcbb] dark:hover:text-[#8fbcbb] hover:bg-[#d8dee9] dark:hover:bg-[#3b4252] px-3 py-2 rounded-md text-base font-medium transition-all duration-200"
-                >
-                  {link.label}
-                </Link>
-              ))}
+              {navLinks.map((link) => 
+                link.children ? (
+                  <div key={link.label} className="space-y-1">
+                    <div className="px-3 py-2 text-[#2e3440] dark:text-[#d8dee9] font-medium">
+                      {link.label}
+                    </div>
+                    {link.children.map((child) => (
+                      <Link
+                        key={child.to}
+                        to={child.to}
+                        onClick={() => setIsMenuOpen(false)}
+                        className="block text-[#4c566a] dark:text-[#81a1c1] hover:text-[#8fbcbb] dark:hover:text-[#8fbcbb] hover:bg-[#d8dee9] dark:hover:bg-[#3b4252] px-6 py-2 rounded-md text-base font-medium transition-all duration-200"
+                      >
+                        {child.label}
+                      </Link>
+                    ))}
+                  </div>
+                ) : (
+                  <Link
+                    key={link.to}
+                    to={link.to}
+                    onClick={() => setIsMenuOpen(false)}
+                    className="block text-[#4c566a] dark:text-[#81a1c1] hover:text-[#8fbcbb] dark:hover:text-[#8fbcbb] hover:bg-[#d8dee9] dark:hover:bg-[#3b4252] px-3 py-2 rounded-md text-base font-medium transition-all duration-200"
+                  >
+                    {link.label}
+                  </Link>
+                )
+              )}
 
               {user ? (
                 <div className="space-y-1">
@@ -144,13 +197,22 @@ function Navbar() {
                   </button>
                 </div>
               ) : (
-                <Link
-                  to="/login"
-                  onClick={() => setIsMenuOpen(false)}
-                  className="block text-[#d08770] dark:text-[#bf616a] hover:text-white hover:bg-[#d08770] dark:hover:bg-[#bf616a] px-3 py-2 rounded-md text-base font-medium transition-all duration-200"
-                >
-                  Login
-                </Link>
+                <div className="space-y-1">
+                  <Link
+                    to="/login"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="block text-[#d08770] dark:text-[#bf616a] hover:text-white hover:bg-[#d08770] dark:hover:bg-[#bf616a] px-3 py-2 rounded-md text-base font-medium transition-all duration-200"
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    to="/register"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="block text-[#d08770] dark:text-[#bf616a] hover:text-white hover:bg-[#d08770] dark:hover:bg-[#bf616a] px-3 py-2 rounded-md text-base font-medium transition-all duration-200"
+                  >
+                    Register
+                  </Link>
+                </div>
               )}
               <div className="px-3 py-2">
                 <ThemeToggle />
