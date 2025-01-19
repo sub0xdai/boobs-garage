@@ -62,6 +62,7 @@ Bob's Garage is a full-stack web application that provides an online presence fo
 - **Tailwind**: Dark mode, custom colors, content paths
 - **Server**: ENV vars, DB connection, JWT secret, CORS
 
+![image](https://github.com/user-attachments/assets/4cd3e802-6b1d-4dc7-a687-aa6d8ba3d837)
 
 
 
