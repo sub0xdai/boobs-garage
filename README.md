@@ -62,12 +62,7 @@ Bob's Garage is a full-stack web application that provides an online presence fo
 - **Tailwind**: Dark mode, custom colors, content paths
 - **Server**: ENV vars, DB connection, JWT secret, CORS
 
-## Development Tools
-- **IDE**: VSCode/nvim
-- **Version Control**: Git
-- **API Testing**: Postman
-- **Debugging**: Browser DevTools
-- **DB Management**: SQLite Browser
+
 
 
 
